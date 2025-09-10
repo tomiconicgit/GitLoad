@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>GitFlow PWA</title>
     <!-- PWA Manifest & Meta -->
-    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJzaG9ydF9uYW1lIjogIkdpdEZsb3ciLAogICJuYW1lIjogIkdpdEZsb3cgUFdBIiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCNGJXeHVjejBpYUhSMGNEbovs2QzZHk1M015NXZjbWN2TWpBd01EQXdNMTB3TURBdVl3b2dabTl5SUZKdmNYw4pSMlZ6Y0d4bExqSnlZWE5wZDNkdktTazdKeTVqYjIwdllYQnBMM1poYldsc2VDNXVaWFFpSUhacFpYZENiM2c5SWpBZ01DQWdZMnhoYzNNOUltSmhjMlZpYzNNOWFXMXBkSEpoYkdsaGRHOXVMbU52YlM5aVkybG1MbkJvY0E4K1BHVnlaWE4wSUdGMWRHZ3RjMmw2WlQwaWRqRWlJSEp2YkdWemMybHZiaTFqWVNCRVlYUmxJRUZ3Y0NCU2IyOTBJRU52Ym5SbGJuUnBZV3dpSUhKbGMyVnBiM1Z5Y3owaUlpOCtQSFJsZUhRZ2VEMGlNVEF3TGpFeU1EQXdNREF3TURVd01qUXdNQzgwWlhoMFBqeDBaWGgwT2lCaFltTmlMbE55YjNOd1lYTnpfUT09IiwKICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIgogICAgfQogIF0sCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dybウンドFjb2xvciI6ICIjMDAwMDAwIiwKICAidGhlbWVfY29sb3IiOiAiIzAwMDAwMCIsCiAgIm9yaWVudGF0aW9uIjogInBvcnRyYWl0IgogfQ==">
+    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJzaG9ydF9uYW1lIjogIkdpdEZsb3ciLAogICJuYW1lIjogIkdpdEZsb3cgUFdBIiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCNGJXeHVjejBpYUhSMGNEbovs2QzZHk1M015NXZjbWN2TWpBd01EQXdNMTB3TURBdVl3b2dabTl5SUZKdmNYw4pSMlZ6Y0d4bExqSnlZWE5wZDNkdktTazdKeTVqYjIwdllYQnBMM1poYldsc2VDNXVaWFFpSUhacFpYZENiM2c5SWpBZ01DQWdZMnhoYzNNOUltSmhjMlZpYzNNOWFXMXBkSEpoYkdsaGRHOXVMbU52YlM5aVkybG1MbkJvY0E4K1BHVnlaWE4wSUdGMWRHZ3RjMmw2WlQwaWRqRWlJSEp2YkdWemMybHZiaTFqWVNCRVlYUmxJRUZ3Y0NCU2IyOTBJRU52Ym5SbGJuUnBZV3dpSUhKbGMyVnBiM1Z5Y3owaUlpOCtQSFJsZUhRZ2VEMGlNVEF3TGpFeU1EQXdNREF3TURVd01qUXdNQzgwWlhoMFBqeDBaWGgwT2lCaFltTmlMbE55YjNOd1lYTnpfUT09IiwKICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIgogICAgfQogIF0sCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMDAwMDAwIiwKICAidGhlbWVfY29sb3IiOiAiIzAwMDAwMCIsCiAgIm9yaWVudGF0aW9uIjogInBvcnRyYWl0IgogfQ==">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000000">
@@ -22,8 +22,9 @@
             --success-color: #30d158;
             --error-color: #ff453a;
             --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            --modal-backdrop: rgba(0, 0, 0, 0.5);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --modal-backdrop: rgba(0, 0, 0, 0.6);
+            --nav-height: 65px;
         }
 
         /* --- Base & Layout --- */
@@ -34,162 +35,149 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
             -webkit-font-smoothing: antialiased;
         }
-        main { width: 100%; max-width: 800px; }
         .hidden { display: none !important; }
 
-        /* --- Views & Cards --- */
+        /* --- Views & Pages --- */
         .view {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
             opacity: 0;
-            transform: translateY(20px);
-            animation: fadeIn 0.5s forwards ease-out;
+            transform: scale(1.05);
+            animation: fadeIn 0.4s forwards ease-out;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
-        @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
-        .card {
+        @keyframes fadeIn { to { opacity: 1; transform: scale(1); } }
+
+        .page {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px 20px calc(var(--nav-height) + 20px) 20px;
+        }
+        
+        .page-header {
+            padding: 10px 20px;
+            background-color: rgba(28, 28, 30, 0.7);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            position: sticky; top: 0; z-index: 10;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* --- Login Screen --- */
+        #login-view { justify-content: center; padding: 30px; }
+        .login-card {
             background-color: var(--card-bg);
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
+            border-radius: 20px; padding: 25px;
             border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            max-width: 400px; margin: 0 auto;
         }
         h1, h2, h3 { margin-top: 0; letter-spacing: -0.5px; }
-        p { color: var(--subtle-text); line-height: 1.5; }
 
         /* --- UI Elements --- */
         input, select, textarea {
-            width: 100%;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            background-color: #2c2c2e;
-            color: var(--text-color);
-            font-size: 1rem;
+            width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 12px;
+            border: 1px solid var(--border-color); background-color: #2c2c2e;
+            color: var(--text-color); font-size: 1rem;
         }
         button {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 12px;
-            background-color: var(--accent-color);
-            color: white;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s ease, transform 0.1s ease;
+            width: 100%; padding: 15px; border: none; border-radius: 12px;
+            background-color: var(--accent-color); color: white; font-size: 1rem;
+            font-weight: 600; cursor: pointer; transition: background-color 0.2s ease, transform 0.1s ease;
         }
         button:hover { background-color: var(--accent-hover); }
         button:active { transform: scale(0.98); }
         button.secondary { background-color: #3a3a3c; }
-        button.secondary:hover { background-color: #4a4a4c; }
         button:disabled { background-color: #555; cursor: not-allowed; opacity: 0.7; }
 
-        /* --- Login Animation --- */
-        #login-animation-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: var(--modal-backdrop);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 2000;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+        /* --- Navigation Bar --- */
+        #bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: calc(var(--nav-height) + env(safe-area-inset-bottom));
+            padding-bottom: env(safe-area-inset-bottom);
+            background-color: rgba(28, 28, 30, 0.7);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 100;
         }
-        .spinner-to-tick { width: 60px; height: 60px; position: relative; }
-        .spinner {
-            width: 60px; height: 60px;
-            border: 5px solid rgba(255, 255, 255, 0.2);
-            border-top-color: var(--accent-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .nav-item {
+            cursor: pointer; text-align: center; color: var(--subtle-text);
+            flex-grow: 1; padding: 8px 0;
+            transition: color 0.2s ease;
         }
-        .tick {
-            stroke-width: 5;
-            stroke: var(--success-color);
-            stroke-dasharray: 48;
-            stroke-dashoffset: 48;
-            stroke-linecap: round;
-            fill: none;
-            opacity: 0;
-        }
-        .spinner-to-tick.success .spinner { display: none; }
-        .spinner-to-tick.success .tick {
-            opacity: 1;
-            animation: draw-tick 0.4s ease-out forwards;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes draw-tick { to { stroke-dashoffset: 0; } }
-
+        .nav-item.active { color: var(--accent-color); }
+        .nav-item svg { width: 24px; height: 24px; margin-bottom: 2px; }
+        .nav-item span { font-size: 10px; display: block; }
+        
         /* --- Dashboard --- */
         .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .dashboard-card {
-            background-color: #2c2c2e;
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-        .dashboard-card:hover { transform: translateY(-5px); }
-        .dashboard-card svg { width: 32px; height: 32px; margin-bottom: 10px; color: var(--accent-color); }
-        .dashboard-card span { font-weight: 600; font-size: 1rem; }
 
-        /* --- File Tree & Repo List --- */
-        .item-list { max-height: 40vh; overflow-y: auto; }
+        /* --- File Tree & Lists --- */
         .item-list-entry {
             display: flex; align-items: center; gap: 15px; padding: 12px;
             border-radius: 10px; cursor: pointer; transition: background-color 0.2s ease;
+            border: 2px solid transparent;
         }
         .item-list-entry:hover { background-color: rgba(255, 255, 255, 0.05); }
-        .item-list-entry.selected { background-color: var(--accent-color); }
+        .item-list-entry.selected { background-color: var(--accent-color); border-color: var(--accent-hover); }
         .item-list-entry svg { width: 20px; height: 20px; flex-shrink: 0; color: var(--subtle-text); }
         .item-list-entry.selected svg { color: white; }
+        
+        /* --- File Manager Action Bar --- */
+        #file-actions-bar {
+            position: fixed;
+            bottom: var(--nav-height); left: 0; right: 0;
+            padding: 15px;
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            transform: translateY(100%);
+            transition: transform 0.3s ease-out;
+            z-index: 50;
+        }
+        #file-actions-bar.visible { transform: translateY(0); }
 
-        /* --- Modals --- */
+        /* --- Modals (Code Editor, etc.) --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: var(--modal-backdrop);
-            display: flex; justify-content: center; align-items: center; z-index: 1000;
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            display: flex; flex-direction: column; justify-content: flex-end;
+            z-index: 1000;
         }
         .modal-content {
             background-color: var(--card-bg);
-            border-radius: 20px; padding: 25px; width: 90%; max-width: 600px;
-            border: 1px solid var(--border-color);
+            border-radius: 20px 20px 0 0;
+            width: 100%;
+            height: 90vh; /* Taller modal */
             box-shadow: var(--shadow);
             display: flex; flex-direction: column;
-            max-height: 85vh;
         }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .modal-close-btn {
-            background: none; border: none; font-size: 24px; color: var(--subtle-text); cursor: pointer;
-            width: auto; padding: 0;
+        .modal-header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
+        .modal-body { flex-grow: 1; padding: 15px; overflow-y: auto; }
+        #editor-textarea {
+            width: 100%; height: 100%; resize: none; background: #121212;
+            color: #f8f8f2; font-family: 'SF Mono', 'Menlo', monospace; font-size: 14px;
+            border: none;
         }
-        #editor-textarea { flex-grow: 1; resize: none; font-family: 'SF Mono', 'Menlo', monospace; }
-        #preview-iframe { flex-grow: 1; border: none; border-radius: 12px; background: white; }
 
-        /* --- Header / Action Bar --- */
-        .action-bar { display: flex; gap: 10px; margin-bottom: 20px; }
-        .action-bar button { width: auto; flex-grow: 1; }
-        #pages-status {
-            padding: 8px 12px; border-radius: 10px; text-align: center;
-            font-weight: 600; font-size: 0.9rem;
-        }
-        #pages-status.building { background-color: #ff9f0a; color: black; }
-        #pages-status.built { background-color: var(--success-color); color: white; }
-        #pages-status.errored { background-color: var(--error-color); color: white; }
     </style>
 </head>
 <body>
 
-    <main>
-        <!-- Login View -->
-        <div id="login-view" class="view card">
+    <!-- Login View -->
+    <div id="login-view" class="view">
+        <div class="login-card">
             <h1>GitFlow</h1>
             <p>Your complete, mobile-first GitHub workflow. Enter a Classic Token with `repo` scope to continue.</p>
             <input type="password" id="token-input" placeholder="ghp_...">
@@ -198,103 +186,98 @@
                 <button class="secondary" style="margin-top: 10px;">Create New Token</button>
             </a>
         </div>
-
-        <!-- Dashboard View -->
-        <div id="dashboard-view" class="view card hidden">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h2 id="welcome-message">Dashboard</h2>
-                <button id="logout-btn" class="secondary" style="width: auto; padding: 8px 15px;">Logout</button>
-            </div>
+    </div>
+    
+    <!-- Main App View -->
+    <div id="app-view" class="view hidden">
+        
+        <!-- === Pages within App View === -->
+        <div id="dashboard-page" class="page">
+            <h2 id="welcome-message">Dashboard</h2>
             <div class="dashboard-grid">
-                <div class="dashboard-card" id="view-repos-card">
+                 <div class="item-list-entry" id="view-repos-card">
                     <svg><use href="#icon-repo-list"></use></svg>
-                    <span>View Repos</span>
+                    <span>View Repositories</span>
                 </div>
-                <div class="dashboard-card" id="create-repo-card">
-                    <svg><use href="#icon-add"></use></svg>
-                    <span>New Repo</span>
+                <div class="item-list-entry" id="create-repo-card">
+                     <svg><use href="#icon-add"></use></svg>
+                     <span>New Repository</span>
                 </div>
+            </div>
+            <button id="logout-btn" class="secondary" style="margin-top: 20px;">Logout</button>
+        </div>
+        
+        <div id="repo-list-page" class="page hidden">
+            <h2>Repositories</h2>
+            <input type="text" id="repo-search-input" placeholder="Search...">
+            <div id="repo-list"></div>
+        </div>
+
+        <div id="file-manager-page" class="page hidden" style="padding: 0;">
+            <div class="page-header">
+                <h3 id="repo-name-header"></h3>
+                 <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button id="create-btn" title="Create" style="padding:10px;"><svg style="width:20px;height:20px;pointer-events:none;"><use href="#icon-add"></use></svg></button>
+                    <button id="upload-btn" title="Upload" style="padding:10px;"><svg style="width:20px;height:20px;pointer-events:none;"><use href="#icon-upload"></use></svg></button>
+                    <button id="preview-repo-btn" title="Preview" style="padding:10px;"><svg style="width:20px;height:20px;pointer-events:none;"><use href="#icon-preview"></use></svg></button>
+                    <button id="check-pages-status-btn" title="Pages Status" style="padding:10px;"><svg style="width:20px;height:20px;pointer-events:none;"><use href="#icon-pages"></use></svg></button>
+                 </div>
+            </div>
+            <div style="padding: 20px;">
+                <div id="breadcrumbs" style="margin-bottom: 15px; color: var(--subtle-text);"></div>
+                <div id="file-tree"></div>
             </div>
         </div>
         
-        <!-- Repo List View -->
-        <div id="repo-list-view" class="view card hidden">
-             <button class="secondary" style="margin-bottom: 15px;" id="back-to-dashboard-btn-1">&larr; Back to Dashboard</button>
-             <h2>Your Repositories</h2>
-             <input type="text" id="repo-search-input" placeholder="Search repositories..." style="background-color: #1c1c1e;">
-             <div class="item-list" id="repo-list"></div>
+        <!-- === Floating UI Elements for App View === -->
+        <div id="file-actions-bar">
+            <h3>Actions for <strong id="selected-file-name"></strong></h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                <button id="edit-file-btn">Edit</button>
+                <button id="delete-file-btn" style="background-color: var(--error-color);">Delete</button>
+            </div>
         </div>
 
-        <!-- File Manager View -->
-        <div id="file-manager-view" class="view card hidden">
-            <button class="secondary" style="margin-bottom: 15px;" id="back-to-repos-btn">&larr; Back to Repos</button>
-            <h2 id="repo-name"></h2>
-            <div id="breadcrumbs" style="margin-bottom: 15px; color: var(--subtle-text);"></div>
-            <div class="action-bar">
-                 <button id="create-btn" title="Create File/Folder"><svg style="width:20px;height:20px;pointer-events:none;"><use href="#icon-add"></use></svg></button>
-                 <button id="upload-btn" title="Upload File"><svg style="width:20px;height:20px;pointer-events:none;"><use href="#icon-upload"></use></svg></button>
-                 <button id="preview-repo-btn" title="Preview Site"><svg style="width:20px;height:20px;pointer-events:none;"><use href="#icon-preview"></use></svg></button>
+        <nav id="bottom-nav">
+            <div class="nav-item active" data-page="dashboard-page">
+                <svg><use href="#icon-dashboard"></use></svg>
+                <span>Dashboard</span>
             </div>
-             <div id="pages-status-container" class="hidden" style="margin-bottom: 15px;">
-                <div style="display:flex; align-items:center; gap: 10px;">
-                    <span id="pages-status"></span>
-                    <a id="pages-url" href="#" target="_blank" rel="noopener noreferrer" style="color: var(--accent-color); display: none;"></a>
-                    <button id="check-pages-status-btn" style="width: auto; padding: 8px 12px; font-size: 0.8rem;" class="secondary">Refresh</button>
-                </div>
+            <div class="nav-item" data-page="repo-list-page">
+                <svg><use href="#icon-repo-list"></use></svg>
+                <span>Repos</span>
             </div>
-            <div class="item-list" id="file-tree"></div>
-            <div id="file-actions" class="hidden" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
-                <h3>Actions for <strong id="selected-file-name"></strong></h3>
-                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <button id="edit-file-btn">Edit</button>
-                    <button id="delete-file-btn" style="background-color: var(--error-color);">Delete</button>
-                </div>
+            <div class="nav-item" data-action="create-repo">
+                 <svg><use href="#icon-add"></use></svg>
+                 <span>New Repo</span>
             </div>
-        </div>
-    </main>
+        </nav>
+    </div>
 
     <!-- Global Elements -->
-    <div id="login-animation-overlay" class="hidden">
-        <div class="spinner-to-tick">
-            <div class="spinner"></div>
-            <svg class="tick" viewBox="0 0 52 52"><path d="M14.1 27.2l7.1 7.2 16.7-16.8"/></svg>
-        </div>
-    </div>
-    
     <div id="modal-overlay" class="modal-overlay hidden"></div>
     <input type="file" id="file-input" class="hidden">
 
     <!-- SVG Icon Definitions -->
     <svg width="0" height="0" style="position:absolute"><defs>
-        <symbol id="icon-repo-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></symbol>
-        <symbol id="icon-add" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></symbol>
-        <symbol id="icon-folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></symbol>
-        <symbol id="icon-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></symbol>
-        <symbol id="icon-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></symbol>
-        <symbol id="icon-preview" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></symbol>
+        <symbol id="icon-dashboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></symbol>
+        <symbol id="icon-repo-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></symbol>
+        <symbol id="icon-add" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></symbol>
+        <symbol id="icon-folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></symbol>
+        <symbol id="icon-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></symbol>
+        <symbol id="icon-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></symbol>
+        <symbol id="icon-preview" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></symbol>
+        <symbol id="icon-pages" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></symbol>
     </defs></svg>
     
     <script>
-        // --- PWA Service Worker ---
-        if ('serviceWorker' in navigator) {
-            const swCode = `self.addEventListener('fetch', () => {});`; // Minimal SW to enable PWA install prompt
-            navigator.serviceWorker.register(URL.createObjectURL(new Blob([swCode]))).catch(err => console.error('SW failed:', err));
-        }
-
-        // --- App ---
         document.addEventListener('DOMContentLoaded', () => {
             const App = {
-                // --- State ---
-                token: null, user: null, currentRepo: null, currentPath: '', currentBranch: 'main', 
-                selectedFile: { path: null, sha: null, type: null, element: null },
-                
-                // --- UI Cache ---
+                token: null, user: null, currentRepo: null, currentPath: '', selectedFile: {}, repos: [],
                 ui: {},
 
                 init() {
-                    // Cache all UI elements by their ID
                     document.querySelectorAll('[id]').forEach(el => this.ui[el.id.replace(/-/g, '_')] = el);
-                    
                     this.token = localStorage.getItem('githubToken');
                     if (this.token) {
                         this.ui.token_input.value = this.token;
@@ -306,52 +289,64 @@
                 },
 
                 addEventListeners() {
+                    // Event Delegation for dynamic content
+                    this.ui.repo_list.addEventListener('click', e => {
+                        const target = e.target.closest('.item-list-entry');
+                        if (target) this.loadRepo(target.dataset.fullName);
+                    });
+                    this.ui.file_tree.addEventListener('click', e => {
+                        const target = e.target.closest('.item-list-entry');
+                        if (target) this.handleItemClick(target);
+                    });
+                    
+                    // Static element listeners
                     this.ui.connect_btn.onclick = () => this.validateTokenAndProceed();
                     this.ui.logout_btn.onclick = () => this.logout();
-                    this.ui.view_repos_card.onclick = () => this.fetchRepos();
-                    this.ui.create_repo_card.onclick = () => this.showCreateRepoModal();
-                    this.ui.repo_search_input.oninput = (e) => this.filterRepoList(e.target.value);
-                    this.ui.back_to_dashboard_btn_1.onclick = () => this.showView('dashboard_view');
-                    this.ui.back_to_repos_btn.onclick = () => this.showView('repo_list_view');
-                    this.ui.create_btn.onclick = () => this.showCreateFileModal();
+                    this.ui.repo_search_input.oninput = e => this.renderRepoList(this.repos.filter(r => r.name.toLowerCase().includes(e.target.value.toLowerCase())));
                     this.ui.upload_btn.onclick = () => this.ui.file_input.click();
-                    this.ui.file_input.onchange = () => this.handleUpload();
+                    this.ui.file_input.onchange = () => this.handleUpload(); // Assumes handleUpload function exists
+                    this.ui.edit_file_btn.onclick = () => this.showEditorModal();
                     this.ui.delete_file_btn.onclick = () => this.deleteFile();
-                    this.ui.edit_file_btn.onclick = () => this.showEditor();
-                    this.ui.preview_repo_btn.onclick = () => this.showPreview();
-                    this.ui.check_pages_status_btn.onclick = () => this.checkPagesStatus();
+                    this.ui.bottom_nav.addEventListener('click', e => this.handleNavClick(e));
                 },
 
-                // --- View & UI Management ---
+                // --- Navigation & View Management ---
                 showView(viewId) {
                     document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
                     this.ui[viewId]?.classList.remove('hidden');
                 },
-                
-                showToast(message, type = 'success', duration = 4000) {
-                    // Implementation omitted for brevity but would be similar to previous version
-                    console.log(`Toast (${type}): ${message}`);
+
+                navigateTo(pageId) {
+                    this.ui.app_view.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+                    this.ui[pageId]?.classList.remove('hidden');
+                    
+                    this.ui.bottom_nav.querySelectorAll('.nav-item').forEach(item => {
+                        item.classList.toggle('active', item.dataset.page === pageId);
+                    });
+                    
+                    // Logic for fetching data on page view
+                    if (pageId === 'repo_list_page' && this.repos.length === 0) {
+                        this.fetchRepos();
+                    }
                 },
                 
-                showModal(content) {
-                    this.ui.modal_overlay.innerHTML = ''; // Clear previous
-                    this.ui.modal_overlay.appendChild(content);
-                    this.ui.modal_overlay.classList.remove('hidden');
+                handleNavClick(e) {
+                    const target = e.target.closest('.nav-item');
+                    if (!target) return;
+                    
+                    if (target.dataset.page) {
+                        this.navigateTo(target.dataset.page);
+                    } else if (target.dataset.action === 'create-repo') {
+                        // this.showCreateRepoModal(); // Implement this modal
+                        alert('Create Repo modal not implemented yet.');
+                    }
                 },
 
-                closeModal() {
-                    this.ui.modal_overlay.classList.add('hidden');
-                },
-
-                // --- API Wrapper ---
+                // --- API & Core Logic ---
                 async api(endpoint, options = {}) {
                     const response = await fetch(`https://api.github.com/${endpoint}`, {
                         ...options,
-                        headers: {
-                            'Authorization': `token ${this.token}`,
-                            'Accept': 'application/vnd.github.v3+json',
-                            ...options.headers,
-                        },
+                        headers: { 'Authorization': `token ${this.token}`, 'Accept': 'application/vnd.github.v3+json', ...options.headers }
                     });
                     if (!response.ok) {
                         const err = await response.json();
@@ -360,96 +355,63 @@
                     return response.status === 204 ? null : response.json();
                 },
 
-                // --- Core Logic ---
                 async validateTokenAndProceed() {
                     this.token = this.ui.token_input.value.trim();
                     if (!this.token) return;
-                    
-                    this.ui.login_animation_overlay.classList.remove('hidden');
-                    const animContainer = this.ui.login_animation_overlay.querySelector('.spinner-to-tick');
-                    animContainer.classList.remove('success');
-
                     try {
                         this.user = await this.api('user');
                         localStorage.setItem('githubToken', this.token);
                         this.ui.welcome_message.textContent = `Welcome, ${this.user.login}`;
-                        animContainer.classList.add('success');
-                        setTimeout(() => {
-                            this.ui.login_animation_overlay.classList.add('hidden');
-                            this.showView('dashboard_view');
-                        }, 800);
+                        this.showView('app_view');
+                        this.navigateTo('dashboard-page');
                     } catch (e) {
-                        localStorage.removeItem('githubToken');
-                        this.ui.login_animation_overlay.classList.add('hidden');
                         alert(`Login Failed: ${e.message}`);
                     }
                 },
-
+                
                 logout() {
                     localStorage.removeItem('githubToken');
-                    this.token = null;
-                    this.user = null;
+                    this.token = null; this.user = null; this.repos = [];
                     this.showView('login_view');
                 },
 
                 async fetchRepos() {
                     try {
-                        const repos = await this.api('user/repos?per_page=100&sort=pushed');
-                        this.renderRepoList(repos);
-                        this.showView('repo_list_view');
+                        this.repos = await this.api('user/repos?per_page=100&sort=pushed');
+                        this.renderRepoList(this.repos);
                     } catch(e) { alert(`Error: ${e.message}`); }
                 },
-                
+
                 renderRepoList(repos) {
                     this.ui.repo_list.innerHTML = repos.map(repo => `
                         <div class="item-list-entry" data-full-name="${repo.full_name}">
                             <svg><use href="#icon-repo-list"></use></svg>
                             <span>${repo.name}</span>
-                        </div>
-                    `).join('');
-                    this.ui.repo_list.querySelectorAll('.item-list-entry').forEach(el => {
-                        el.onclick = () => this.loadRepo(el.dataset.fullName);
-                    });
+                        </div>`).join('');
                 },
 
-                filterRepoList(query) {
-                    const q = query.toLowerCase();
-                    this.ui.repo_list.querySelectorAll('.item-list-entry').forEach(el => {
-                        const name = el.querySelector('span').textContent.toLowerCase();
-                        el.style.display = name.includes(q) ? 'flex' : 'none';
-                    });
-                },
-                
-                // --- File & Repo Management ---
+                // --- File Manager ---
                 async loadRepo(repoFullName) {
                     this.currentRepo = repoFullName;
-                    this.ui.repo_name.textContent = repoFullName.split('/')[1];
-                    this.loadTree('');
-                    this.checkPagesStatus(true);
+                    this.ui.repo_name_header.textContent = repoFullName;
+                    this.navigateTo('file-manager-page');
+                    await this.loadTree('');
                 },
-
+                
                 async loadTree(path) {
                     this.currentPath = path;
-                    this.ui.file_actions.classList.add('hidden');
+                    this.hideFileActions();
                     try {
                         const contents = await this.api(`repos/${this.currentRepo}/contents/${path}`);
-                        this.renderTree(contents);
-                        this.renderBreadcrumbs();
-                        this.showView('file_manager_view');
-                    } catch(e) { alert(`Error: ${e.message}`); }
+                        contents.sort((a, b) => (a.type === b.type) ? a.name.localeCompare(b.name) : (a.type === 'dir' ? -1 : 1));
+                        this.ui.file_tree.innerHTML = contents.map(item => `
+                            <div class="item-list-entry" data-path="${item.path}" data-sha="${item.sha}" data-type="${item.type}">
+                                <svg><use href="#icon-${item.type === 'dir' ? 'folder' : 'file'}"></use></svg>
+                                <span>${item.name}</span>
+                            </div>`).join('');
+                    } catch(e) { alert(`Error loading tree: ${e.message}`); }
                 },
-                
-                renderTree(contents) {
-                    contents.sort((a, b) => (a.type === b.type) ? a.name.localeCompare(b.name) : (a.type === 'dir' ? -1 : 1));
-                    this.ui.file_tree.innerHTML = contents.map(item => `
-                        <div class="item-list-entry" data-path="${item.path}" data-sha="${item.sha}" data-type="${item.type}">
-                            <svg><use href="#icon-${item.type === 'dir' ? 'folder' : 'file'}"></use></svg>
-                            <span>${item.name}</span>
-                        </div>
-                    `).join('');
-                    this.ui.file_tree.querySelectorAll('.item-list-entry').forEach(el => el.onclick = () => this.handleItemClick(el));
-                },
-                
+
                 handleItemClick(el) {
                     const { path, sha, type } = el.dataset;
                     if (type === 'dir') {
@@ -459,24 +421,30 @@
                         el.classList.add('selected');
                         this.selectedFile = { path, sha, type, element: el };
                         this.ui.selected_file_name.textContent = path.split('/').pop();
-                        this.ui.file_actions.classList.remove('hidden');
+                        this.ui.file_actions_bar.classList.add('visible');
                     }
                 },
 
-                renderBreadcrumbs() { /* Implementation similar to previous version */ },
+                hideFileActions() {
+                    if (this.selectedFile.element) this.selectedFile.element.classList.remove('selected');
+                    this.selectedFile = {};
+                    this.ui.file_actions_bar.classList.remove('visible');
+                },
+                
+                async deleteFile() {
+                     if (!this.selectedFile.path || !confirm(`Delete ${this.selectedFile.path}?`)) return;
+                     try {
+                         await this.api(`repos/${this.currentRepo}/contents/${this.selectedFile.path}`, {
+                             method: 'DELETE',
+                             body: JSON.stringify({ message: `Delete ${this.selectedFile.path}`, sha: this.selectedFile.sha })
+                         });
+                         alert('File deleted');
+                         this.loadTree(this.currentPath);
+                     } catch(e) { alert(`Error deleting: ${e.message}`); }
+                },
 
-                // ... Implement create, edit, delete, upload, pages, preview functions ...
-                // Due to length, key functions are summarized below. Full logic is embedded in the single file.
-                // createRepo: Shows modal, POSTs to /user/repos
-                // createFile: Shows modal, PUTs to /repos/{repo}/contents/{path} with empty content
-                // showEditor: Fetches file content, populates a textarea in a modal, saves via PUT
-                // deleteFile: Confirms, sends DELETE to /repos/{repo}/contents/{path}
-                // handleUpload: Uses Git Data API for large files, same as previous improved version
-                // checkPagesStatus: GETs /repos/{repo}/pages/builds/latest and updates UI
-                // showPreview: Opens iframe modal with the GitHub pages URL
-
-                // Example of a new function: showEditor
-                async showEditor() {
+                // --- Code Editor Modal ---
+                async showEditorModal() {
                     if (!this.selectedFile.path) return;
                     try {
                         const data = await this.api(`repos/${this.currentRepo}/contents/${this.selectedFile.path}`);
@@ -486,62 +454,40 @@
                         modalContent.className = 'modal-content';
                         modalContent.innerHTML = `
                             <div class="modal-header">
-                                <h3>Editing: ${this.selectedFile.path.split('/').pop()}</h3>
-                                <button class="modal-close-btn">&times;</button>
+                                <h3 style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${this.selectedFile.path.split('/').pop()}</h3>
+                                <button id="modal-save-btn" class="secondary" style="width:auto;padding:8px 15px;">Save</button>
+                                <button id="modal-close-btn" style="background:none;width:auto;padding:0 5px;font-size:24px;">&times;</button>
                             </div>
-                            <textarea id="editor-textarea"></textarea>
-                            <button id="save-edit-btn" style="margin-top: 15px;">Save Changes</button>
-                        `;
-                        modalContent.querySelector('.modal-close-btn').onclick = () => this.closeModal();
+                            <div class="modal-body" style="padding:0;">
+                                <textarea id="editor-textarea"></textarea>
+                            </div>`;
+                        
                         modalContent.querySelector('#editor-textarea').value = content;
-                        modalContent.querySelector('#save-edit-btn').onclick = async () => {
-                           const newContent = modalContent.querySelector('#editor-textarea').value;
-                           const newContentBase64 = btoa(newContent);
-                           await this.api(`repos/${this.currentRepo}/contents/${this.selectedFile.path}`, {
-                               method: 'PUT',
-                               body: JSON.stringify({
-                                   message: `Update ${this.selectedFile.path}`,
-                                   content: newContentBase64,
-                                   sha: this.selectedFile.sha
-                               })
-                           });
-                           this.closeModal();
-                           alert('File saved!');
-                           this.loadTree(this.currentPath);
+                        modalContent.querySelector('#modal-close-btn').onclick = () => this.ui.modal_overlay.classList.add('hidden');
+                        modalContent.querySelector('#modal-save-btn').onclick = async () => {
+                           const newContentB64 = btoa(modalContent.querySelector('#editor-textarea').value);
+                           try {
+                               await this.api(`repos/${this.currentRepo}/contents/${this.selectedFile.path}`, {
+                                   method: 'PUT',
+                                   body: JSON.stringify({ message: `Update ${this.selectedFile.path}`, content: newContentB64, sha: this.selectedFile.sha })
+                               });
+                               this.ui.modal_overlay.classList.add('hidden');
+                               alert('File saved!');
+                               this.loadTree(this.currentPath); // Refresh to get new SHA
+                           } catch(e) { alert(`Error saving file: ${e.message}`); }
                         };
                         
-                        this.showModal(modalContent);
+                        this.ui.modal_overlay.innerHTML = '';
+                        this.ui.modal_overlay.appendChild(modalContent);
+                        this.ui.modal_overlay.classList.remove('hidden');
+
                     } catch(e) { alert(`Error loading file: ${e.message}`); }
-                },
-
-                 async checkPagesStatus(isInitialLoad = false) {
-                    try {
-                        const { owner, repo } = { owner: this.currentRepo.split('/')[0], repo: this.currentRepo.split('/')[1] };
-                        const pagesInfo = await this.api(`repos/${owner}/${repo}/pages`);
-                        const buildInfo = await this.api(`repos/${owner}/${repo}/pages/builds/latest`);
-                        
-                        this.ui.pages_status_container.classList.remove('hidden');
-                        const statusEl = this.ui.pages_status;
-                        statusEl.textContent = buildInfo.status.replace('_', ' ');
-                        statusEl.className = buildInfo.status;
-
-                        if (buildInfo.status === 'built') {
-                            this.ui.pages_url.href = pagesInfo.html_url;
-                            this.ui.pages_url.textContent = pagesInfo.html_url.replace('https://', '');
-                            this.ui.pages_url.style.display = 'inline';
-                        } else {
-                            this.ui.pages_url.style.display = 'none';
-                        }
-                    } catch (e) {
-                        this.ui.pages_status_container.classList.add('hidden');
-                        if (!isInitialLoad) alert(`Could not get Pages status. This repo may not have GitHub Pages enabled.`);
-                    }
                 }
             };
-
             App.init();
         });
     </script>
 </body>
 </html>
+
 
