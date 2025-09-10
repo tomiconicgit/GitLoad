@@ -2,474 +2,602 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#121212" media="(prefers-color-scheme: dark)">
-    <title>My GitHub PWA</title>
-    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJzaG9ydF9uYW1lIjogIkdpdEh1YiBQV0EiLAogICJuYW1lIjogIk15IEdpdEh1YiBQV0EiLAogICJpY29ucyI6IFtdLAogICJzdGFydF91cmwiOiAiLmluZGV4Lmh0bWwiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNmZmZmZmYiLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJ0aGVtZV9jb2xvciI6ICIjMDA3YmZmIgp9">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>GitFlow PWA</title>
+    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJzaG9ydF9uYW1lIjogIkdpdEZsb3ciLAogICJuYW1lIjogIkdpdEZsb3cgUFdBIiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCNGJXeHVjejBpYUhSMGNEb3ZMM2QzZHk1M015NXZjbWN2TWpBd01EQXdNMTB3TURBdVl3b2dabTl5SUZKdmNYw4pSMlZ6Y0d4bExqSnlZWE5wZDNkdktTazdKeTVqYjIwdllYQnBMM1poYldsc2VDNXVaWFFpSUhacFpYZENiM2c5SWpBZ01DQWdZMnhoYzNNOUltSmhjMlZpYzNNOWFXMXBkSEpoYkdsaGRHOXVMbU52YlM5aVkybG1MbkJvY0E4K1BHVnlaWE4wSUdGMWRHZ3RjMmw2WlQwaWRqRWlJSEp2YkdWemMybHZiaTFqWVNCRVlYUmxJRUZ3Y0NCU2IyOTBJRU52Ym5SbGJuUnBZV3dpSUhKbGMyVnBiM1Z5Y3owaUlpOCtQSFJsZUhRZ2VEMGlNVEF3TGpFeU1EQXdNREF3TURVd01qUXdNQzgwWlhoMFBqeDBaWGgwT2lCaFltTmlMbE55YjNOd1lYTnpfUT09IiwKICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIgogICAgfQogIF0sCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMTYxYjIzIiwKICAidGhlbWVfY29sb3IiOiAiIzE2MWIyMyIKfQ==">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f4f4f4" media="(prefers-color-scheme: light)">
+
     <style>
         :root {
-            --bg-color: #f4f4f4;
-            --text-color: #333;
-            --accent-color: #007bff;
-            --input-bg: #fff;
-            --status-bg: #e9ecef;
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-color: #1c1e21;
+            --subtle-text: #606770;
+            --border-color: #dddfe2;
+            --accent-color: #0866ff;
+            --accent-hover: #0654d1;
+            --success-color: #31a24c;
+            --error-color: #e02c4f;
+            --loader-color: #0866ff;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
+
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg-color: #121212;
-                --text-color: #ddd;
-                --accent-color: #0d6efd;
-                --input-bg: #333;
-                --status-bg: #222;
+                --card-bg: #1e1e1e;
+                --text-color: #e4e6eb;
+                --subtle-text: #b0b3b8;
+                --border-color: #3e4042;
+                --accent-color: #4599ff;
+                --accent-hover: #63aaff;
+                --success-color: #4bcc69;
+                --error-color: #ff5263;
+                --loader-color: #4599ff;
             }
         }
+
+        /* --- Base & Layout --- */
+        * { box-sizing: border-box; }
+        html { -webkit-tap-highlight-color: transparent; }
         body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
+            font-family: var(--font-family);
             background-color: var(--bg-color);
             color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
         }
-        input, select, button {
+
+        main {
             width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            box-sizing: border-box;
-            background-color: var(--input-bg);
+            max-width: 800px;
+        }
+
+        /* --- Cards & Sections --- */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+        .card h1, .card h2 {
+            margin-top: 0;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+        .hidden { display: none !important; }
+
+        /* --- UI Elements --- */
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-color);
             color: var(--text-color);
-            border: 1px solid #ccc;
+            font-size: 1rem;
         }
         button {
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
             background-color: var(--accent-color);
             color: white;
-            border: none;
+            font-size: 1rem;
+            font-weight: bold;
             cursor: pointer;
+            transition: background-color 0.2s ease;
         }
-        button:hover {
-            opacity: 0.9;
-        }
-        #status {
-            margin-top: 20px;
+        button:hover, button:focus { background-color: var(--accent-hover); outline: none; }
+        button.secondary { background-color: var(--subtle-text); }
+        button:disabled { background-color: #888; cursor: not-allowed; }
+        
+        /* --- File Tree --- */
+        #file-tree-container { max-height: 400px; overflow-y: auto; }
+        #file-tree, #file-tree ul { list-style-type: none; padding: 0; margin: 0; }
+        #file-tree li {
             padding: 10px;
-            background-color: var(--status-bg);
-            border-radius: 5px;
-            word-wrap: break-word;
-        }
-        #fileTree {
-            list-style-type: none;
-            padding: 0;
-        }
-        #fileTree li {
+            border-radius: 6px;
             cursor: pointer;
-            margin: 5px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background-color 0.2s ease;
         }
-        #fileTree li.folder::before {
-            content: '📁 ';
+        #file-tree li:hover { background-color: rgba(128,128,128,0.1); }
+        #file-tree li.selected { background-color: var(--accent-color); color: white; }
+        #file-tree svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+        /* Breadcrumbs */
+        #breadcrumbs { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 15px; }
+        #breadcrumbs span { cursor: pointer; color: var(--accent-color); }
+        #breadcrumbs span:hover { text-decoration: underline; }
+        #breadcrumbs span:not(:last-child)::after { content: '/'; margin-left: 5px; color: var(--subtle-text); text-decoration: none; cursor: default; }
+
+        /* --- Loader Overlay --- */
+        #loader-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 1000;
         }
-        #fileTree li.file::before {
-            content: '📄 ';
+        #loader-spinner {
+            width: 50px; height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top-color: var(--loader-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
-        #fileContent {
-            margin-top: 20px;
-            white-space: pre-wrap;
-            background-color: var(--input-bg);
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* --- Toast Notifications --- */
+        #toast-container {
+            position: fixed; top: 20px; right: 20px; z-index: 1001;
         }
-        #progressBar {
-            width: 100%;
-            background-color: #ddd;
-            height: 20px;
-            margin-top: 10px;
-            border-radius: 5px;
-            overflow: hidden;
+        .toast {
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+            opacity: 0;
+            transform: translateX(100%);
+            animation: slideIn 0.5s forwards;
         }
-        #progress {
-            width: 0%;
-            height: 100%;
-            background-color: var(--accent-color);
-            transition: width 0.3s;
+        .toast.success { background-color: var(--success-color); }
+        .toast.error { background-color: var(--error-color); }
+        @keyframes slideIn { to { opacity: 1; transform: translateX(0); } }
+
+        /* --- Upload Section --- */
+        #upload-progress-bar {
+            width: 100%; height: 8px; background-color: var(--border-color);
+            border-radius: 4px; overflow: hidden; margin-top: 10px;
+        }
+        #upload-progress {
+            width: 0%; height: 100%; background-color: var(--accent-color);
+            transition: width 0.3s ease;
         }
     </style>
 </head>
 <body>
-    <h1>My GitHub PWA</h1>
-    <p>A mobile-friendly PWA for managing GitHub repos. Supports dark mode, file browsing, editing, and large uploads up to 50MB with progress.</p>
-    <p><strong>Troubleshooting Tip:</strong> Ensure your token has 'repo' scope (classic) or 'Contents: write' (fine-grained). For errors, check the detailed message below or console.</p>
-    
-    <label for="token">GitHub Token:</label>
-    <input type="password" id="token" placeholder="Enter your GitHub token">
-    <button id="saveToken">Save Token</button>
-    
-    <button id="fetchRepos">Load My Repositories</button>
-    
-    <label for="repoSelect">Select Repository:</label>
-    <select id="repoSelect">
-        <option value="">-- Select a repo --</option>
-    </select>
-    
-    <div id="repoActions" style="display: none;">
-        <h2>Files in Repo</h2>
-        <ul id="fileTree"></ul>
-        
-        <h2>Upload File (up to 50MB)</h2>
-        <input type="file" id="fileInput">
-        <label for="uploadPath">Upload Path (optional, defaults to root/file name):</label>
-        <input type="text" id="uploadPath" placeholder="e.g., folder/file.ext">
-        <button id="uploadButton">Upload</button>
-        <div id="progressBar" style="display: none;">
-            <div id="progress"></div>
+
+    <main>
+        <div id="login-view" class="card">
+            <h1>GitFlow PWA</h1>
+            <p>Enter your GitHub Personal Access Token to begin. A **Classic Token** with full `repo` scope is required for all features, including large file uploads.</p>
+            <input type="password" id="token-input" placeholder="ghp_...">
+            <button id="save-token-btn">Save & Connect</button>
         </div>
+
+        <div id="repo-list-view" class="card hidden">
+            <h2 id="repo-list-title">Your Repositories</h2>
+            <select id="repo-select"></select>
+            <button id="load-repo-btn">Open Selected Repo</button>
+            <button id="logout-btn" class="secondary" style="margin-top: 10px;">Log Out</button>
+        </div>
+
+        <div id="files-view" class="card hidden">
+            <button id="back-to-repos-btn" style="margin-bottom: 15px;">&larr; Back to Repos</button>
+            <h2 id="repo-name"></h2>
+            <div id="breadcrumbs"></div>
+            <div id="file-tree-container">
+                <ul id="file-tree"></ul>
+            </div>
+            
+            <div id="file-actions" class="hidden" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                <h3>Actions for <strong id="selected-file-name"></strong></h3>
+                <button id="delete-file-btn">Delete File</button>
+            </div>
+        </div>
+        
+        <div id="upload-view" class="card hidden">
+             <h2>Upload to <strong id="upload-repo-name"></strong></h2>
+             <p>Select a file to upload. Larger files may take some time. The path will default to the current directory.</p>
+             <input type="file" id="file-input">
+             <input type="text" id="upload-path-input" placeholder="Optional: folder/filename.ext">
+             <button id="upload-btn">Upload File</button>
+             <div id="upload-progress-bar" class="hidden">
+                 <div id="upload-progress"></div>
+             </div>
+             <p id="upload-status" style="margin-top: 10px; color: var(--subtle-text);"></p>
+        </div>
+
+    </main>
+
+    <div id="loader-overlay" class="hidden">
+        <div id="loader-spinner"></div>
     </div>
+    <div id="toast-container"></div>
     
-    <div id="fileActions" style="display: none;">
-        <h2>File Actions</h2>
-        <button id="viewFile">View</button>
-        <button id="renameFile">Rename/Move</button>
-        <button id="deleteFile">Delete</button>
-        <div id="fileContent"></div>
-    </div>
-    
-    <div id="status"></div>
+    <svg width="0" height="0" style="position:absolute">
+      <defs>
+        <symbol id="icon-folder" viewBox="0 0 24 24">
+          <path fill="currentColor" d="M10 4H4c-1.11 0-2 .89-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8c0-1.11-.9-2-2-2h-8l-2-2z"/>
+        </symbol>
+        <symbol id="icon-file" viewBox="0 0 24 24">
+          <path fill="currentColor" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+        </symbol>
+      </defs>
+    </svg>
 
     <script>
-        // PWA Service Worker (basic caching)
+        // --- PWA Service Worker ---
         if ('serviceWorker' in navigator) {
             const swCode = `
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open('github-pwa-v1').then((cache) => cache.addAll(['/']))
-  );
-});
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => response || fetch(event.request))
-  );
-});
+                self.addEventListener('install', e => e.waitUntil(caches.open('gitflow-pwa-v1').then(c => c.addAll(['/']))));
+                self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r => r || fetch(e.request))));
             `;
             const swBlob = new Blob([swCode], { type: 'application/javascript' });
-            const swUrl = URL.createObjectURL(swBlob);
-            navigator.serviceWorker.register(swUrl)
-                .then(reg => console.log('SW registered'))
-                .catch(err => console.log('SW error', err));
+            navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(err => console.error('SW registration failed:', err));
         }
 
-        const tokenInput = document.getElementById('token');
-        const saveTokenButton = document.getElementById('saveToken');
-        const fetchReposButton = document.getElementById('fetchRepos');
-        const repoSelect = document.getElementById('repoSelect');
-        const fileTree = document.getElementById('fileTree');
-        const fileInput = document.getElementById('fileInput');
-        const uploadPathInput = document.getElementById('uploadPath');
-        const uploadButton = document.getElementById('uploadButton');
-        const progressBar = document.getElementById('progressBar');
-        const progress = document.getElementById('progress');
-        const viewFileButton = document.getElementById('viewFile');
-        const renameFileButton = document.getElementById('renameFile');
-        const deleteFileButton = document.getElementById('deleteFile');
-        const fileContent = document.getElementById('fileContent');
-        const statusDiv = document.getElementById('status');
-        const repoActions = document.getElementById('repoActions');
-        const fileActions = document.getElementById('fileActions');
+        // --- App ---
+        document.addEventListener('DOMContentLoaded', () => {
 
-        let token = localStorage.getItem('githubToken') || '';
-        tokenInput.value = token;
-        let selectedRepo = '';
-        let selectedPath = '';
-        let currentTree = {};
-        let selectedSha = '';
+            const App = {
+                // --- State ---
+                token: null,
+                user: null,
+                currentRepo: null,
+                currentPath: '',
+                currentBranch: 'main', // Default branch
+                selectedFile: { path: null, sha: null, element: null },
 
-        saveTokenButton.addEventListener('click', () => {
-            token = tokenInput.value.trim();
-            if (token) {
-                localStorage.setItem('githubToken', token);
-                statusDiv.textContent = 'Token saved.';
-            } else {
-                statusDiv.textContent = 'Please enter a token.';
-            }
-        });
-
-        fetchReposButton.addEventListener('click', async () => {
-            if (!token) return statusDiv.textContent = 'No token.';
-            statusDiv.textContent = 'Fetching repos...';
-            try {
-                const response = await fetch('https://api.github.com/user/repos?per_page=100', {
-                    headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
-                });
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || `Status: ${response.status}`);
-                }
-                const repos = await response.json();
-                repoSelect.innerHTML = '<option value="">-- Select a repo --</option>';
-                repos.forEach(repo => {
-                    const option = document.createElement('option');
-                    option.value = repo.full_name;
-                    option.textContent = repo.full_name;
-                    repoSelect.appendChild(option);
-                });
-                statusDiv.textContent = 'Repos loaded.';
-            } catch (error) {
-                statusDiv.textContent = `Error fetching repos: ${error.message}`;
-                console.error(error);
-            }
-        });
-
-        repoSelect.addEventListener('change', async () => {
-            selectedRepo = repoSelect.value;
-            if (!selectedRepo) return;
-            repoActions.style.display = 'block';
-            statusDiv.textContent = 'Loading files...';
-            await loadTree('');
-            statusDiv.textContent = 'Files loaded.';
-        });
-
-        async function loadTree(path) {
-            try {
-                const response = await fetch(`https://api.github.com/repos/${selectedRepo}/contents/${encodeURIComponent(path)}`, {
-                    headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
-                });
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || `Status: ${response.status}`);
-                }
-                const contents = await response.json();
-                fileTree.innerHTML = '';
-                contents.forEach(item => {
-                    const li = document.createElement('li');
-                    li.textContent = item.name;
-                    li.className = item.type === 'dir' ? 'folder' : 'file';
-                    li.dataset.path = item.path;
-                    li.dataset.sha = item.sha;
-                    if (item.type === 'dir') {
-                        li.addEventListener('click', async (e) => {
-                            e.stopPropagation();
-                            if (li.querySelector('ul')) return;
-                            const subUl = document.createElement('ul');
-                            li.appendChild(subUl);
-                            await loadSubTree(subUl, item.path);
-                        });
-                    } else {
-                        li.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            selectedPath = item.path;
-                            selectedSha = item.sha;
-                            fileActions.style.display = 'block';
-                            statusDiv.textContent = `Selected: ${item.path}`;
-                        });
-                    }
-                    fileTree.appendChild(li);
-                });
-            } catch (error) {
-                statusDiv.textContent = `Error loading tree: ${error.message}`;
-                console.error(error);
-            }
-        }
-
-        async function loadSubTree(ul, path) {
-            try {
-                const response = await fetch(`https://api.github.com/repos/${selectedRepo}/contents/${encodeURIComponent(path)}`, {
-                    headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
-                });
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || `Status: ${response.status}`);
-                }
-                const contents = await response.json();
-                contents.forEach(item => {
-                    const li = document.createElement('li');
-                    li.textContent = item.name;
-                    li.className = item.type === 'dir' ? 'folder' : 'file';
-                    li.dataset.path = item.path;
-                    li.dataset.sha = item.sha;
-                    if (item.type === 'dir') {
-                        li.addEventListener('click', async (e) => {
-                            e.stopPropagation();
-                            if (li.querySelector('ul')) return;
-                            const subUl = document.createElement('ul');
-                            li.appendChild(subUl);
-                            await loadSubTree(subUl, item.path);
-                        });
-                    } else {
-                        li.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            selectedPath = item.path;
-                            selectedSha = item.sha;
-                            fileActions.style.display = 'block';
-                            statusDiv.textContent = `Selected: ${item.path}`;
-                        });
-                    }
-                    ul.appendChild(li);
-                });
-            } catch (error) {
-                statusDiv.textContent = `Error loading subtree: ${error.message}`;
-                console.error(error);
-            }
-        }
-
-        viewFileButton.addEventListener('click', async () => {
-            if (!selectedPath) return;
-            statusDiv.textContent = 'Fetching file...';
-            try {
-                const response = await fetch(`https://api.github.com/repos/${selectedRepo}/contents/${encodeURIComponent(selectedPath)}`, {
-                    headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
-                });
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || `Status: ${response.status}`);
-                }
-                const data = await response.json();
-                const content = atob(data.content.replace(/\n/g, ''));
-                fileContent.textContent = content;
-                statusDiv.textContent = 'File viewed.';
-            } catch (error) {
-                statusDiv.textContent = `Error viewing file: ${error.message}`;
-                console.error(error);
-                fileContent.innerHTML = `<a href="https://github.com/${selectedRepo}/blob/main/${encodeURIComponent(selectedPath)}" target="_blank">Download/View on GitHub</a>`;
-            }
-        });
-
-        renameFileButton.addEventListener('click', async () => {
-            if (!selectedPath) return;
-            const newPath = prompt('Enter new path (for rename/move):', selectedPath);
-            if (!newPath || newPath === selectedPath) return;
-            statusDiv.textContent = 'Moving/renaming...';
-            try {
-                // Fetch old content
-                const getResp = await fetch(`https://api.github.com/repos/${selectedRepo}/contents/${encodeURIComponent(selectedPath)}`, {
-                    headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
-                });
-                if (!getResp.ok) {
-                    const errorData = await getResp.json();
-                    throw new Error(errorData.message || `Get status: ${getResp.status}`);
-                }
-                const data = await getResp.json();
+                // --- UI Elements ---
+                ui: {
+                    views: {
+                        login: document.getElementById('login-view'),
+                        repoList: document.getElementById('repo-list-view'),
+                        files: document.getElementById('files-view'),
+                        upload: document.getElementById('upload-view'),
+                    },
+                    loader: document.getElementById('loader-overlay'),
+                    toastContainer: document.getElementById('toast-container'),
+                    tokenInput: document.getElementById('token-input'),
+                    repoSelect: document.getElementById('repo-select'),
+                    fileTree: document.getElementById('file-tree'),
+                    breadcrumbs: document.getElementById('breadcrumbs'),
+                    repoName: document.getElementById('repo-name'),
+                    uploadRepoName: document.getElementById('upload-repo-name'),
+                    fileActions: document.getElementById('file-actions'),
+                    selectedFileName: document.getElementById('selected-file-name'),
+                    fileInput: document.getElementById('file-input'),
+                    uploadPathInput: document.getElementById('upload-path-input'),
+                    uploadProgressBar: document.getElementById('upload-progress-bar'),
+                    uploadProgress: document.getElementById('upload-progress'),
+                    uploadStatus: document.getElementById('upload-status'),
+                },
                 
-                // Upload to new path
-                const putResp = await fetch(`https://api.github.com/repos/${selectedRepo}/contents/${encodeURIComponent(newPath)}`, {
-                    method: 'PUT',
-                    headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: `Rename ${selectedPath} to ${newPath}`, content: data.content })
-                });
-                if (!putResp.ok) {
-                    const errorData = await putResp.json();
-                    throw new Error(errorData.message || `Put status: ${putResp.status}`);
-                }
-                
-                // Delete old
-                const delResp = await fetch(`https://api.github.com/repos/${selectedRepo}/contents/${encodeURIComponent(selectedPath)}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: `Delete ${selectedPath} after rename`, sha: selectedSha })
-                });
-                if (!delResp.ok) {
-                    const errorData = await delResp.json();
-                    throw new Error(errorData.message || `Delete status: ${delResp.status}`);
-                }
-                
-                statusDiv.textContent = 'Renamed/moved successfully.';
-                await loadTree('');
-            } catch (error) {
-                statusDiv.textContent = `Error renaming/moving: ${error.message}`;
-                console.error(error);
-            }
-        });
-
-        deleteFileButton.addEventListener('click', async () => {
-            if (!selectedPath || !confirm('Delete this file?')) return;
-            statusDiv.textContent = 'Deleting...';
-            try {
-                const response = await fetch(`https://api.github.com/repos/${selectedRepo}/contents/${encodeURIComponent(selectedPath)}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: `Delete ${selectedPath}`, sha: selectedSha })
-                });
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || `Status: ${response.status}`);
-                }
-                statusDiv.textContent = 'Deleted successfully.';
-                await loadTree('');
-                fileActions.style.display = 'none';
-            } catch (error) {
-                statusDiv.textContent = `Error deleting: ${error.message}`;
-                console.error(error);
-            }
-        });
-
-        uploadButton.addEventListener('click', () => {
-            const file = fileInput.files[0];
-            if (!file || !selectedRepo) return statusDiv.textContent = 'Select file and repo.';
-            if (file.size > 50 * 1024 * 1024) return statusDiv.textContent = 'File too large (max 50MB; GitHub limit is 100MB but base64 inflates size).';
-            const path = uploadPathInput.value.trim() || file.name;
-            statusDiv.textContent = 'Preparing...';
-            progressBar.style.display = 'block';
-            progress.style.width = '0%';
-
-            const reader = new FileReader();
-            reader.onprogress = (e) => {
-                if (e.lengthComputable) progress.style.width = `${(e.loaded / e.total) * 50}%`; // 50% for reading
-            };
-            reader.onload = () => {
-                const base64 = reader.result.split(',')[1];
-                statusDiv.textContent = 'Uploading...';
-                const xhr = new XMLHttpRequest();
-                xhr.open('PUT', `https://api.github.com/repos/${selectedRepo}/contents/${encodeURIComponent(path)}`);
-                xhr.setRequestHeader('Authorization', `token ${token}`);
-                xhr.setRequestHeader('Accept', 'application/vnd.github.v3+json');
-                xhr.setRequestHeader('Content-Type', 'application/json');
-                xhr.upload.onprogress = (e) => {
-                    if (e.lengthComputable) progress.style.width = `${50 + (e.loaded / e.total) * 50}%`; // 50-100% for upload
-                };
-                xhr.onload = () => {
-                    progressBar.style.display = 'none';
-                    if (xhr.status >= 200 && xhr.status < 300) {
-                        statusDiv.textContent = 'Uploaded successfully! File pushed to repo.';
-                        loadTree('');
+                // --- Initialization ---
+                init() {
+                    this.token = localStorage.getItem('githubToken');
+                    if (this.token) {
+                        this.ui.tokenInput.value = this.token;
+                        this.showView('repoList');
+                        this.fetchUserAndRepos();
                     } else {
-                        let errorMsg = `HTTP ${xhr.status}: ${xhr.statusText}`;
-                        try {
-                            const errorData = JSON.parse(xhr.response);
-                            errorMsg = `GitHub Error: ${errorData.message || errorMsg}` + (errorData.errors ? ` - ${errorData.errors.map(e => e.message).join(', ')}` : '');
-                        } catch {}
-                        statusDiv.textContent = errorMsg;
-                        console.error('Upload error:', xhr.response);
+                        this.showView('login');
                     }
-                };
-                xhr.onerror = () => {
-                    statusDiv.textContent = 'Network error during upload. Check connection.';
-                    progressBar.style.display = 'none';
-                    console.error('XHR error');
-                };
+                    this.addEventListeners();
+                },
 
-                // Check for existing SHA
-                fetch(`https://api.github.com/repos/${selectedRepo}/contents/${encodeURIComponent(path)}`, {
-                    headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
-                }).then(res => {
-                    if (res.ok) return res.json();
-                    if (res.status === 404) return { sha: undefined };
-                    return res.json().then(errorData => { throw new Error(errorData.message || `Check status: ${res.status}`); });
-                }).then(data => {
-                    const body = {
-                        message: `Upload ${path} via PWA`,
-                        content: base64
+                // --- Event Listeners ---
+                addEventListeners() {
+                    document.getElementById('save-token-btn').addEventListener('click', () => this.saveToken());
+                    document.getElementById('logout-btn').addEventListener('click', () => this.logout());
+                    document.getElementById('load-repo-btn').addEventListener('click', () => this.loadSelectedRepo());
+                    document.getElementById('back-to-repos-btn').addEventListener('click', () => this.showView('repoList'));
+                    document.getElementById('delete-file-btn').addEventListener('click', () => this.deleteFile());
+                    document.getElementById('upload-btn').addEventListener('click', () => this.handleUpload());
+                },
+
+                // --- View Management ---
+                showView(viewName) {
+                    Object.values(this.ui.views).forEach(v => v.classList.add('hidden'));
+                    if (this.ui.views[viewName]) {
+                        this.ui.views[viewName].classList.remove('hidden');
+                    }
+                },
+
+                showLoader(show) {
+                    this.ui.loader.classList.toggle('hidden', !show);
+                },
+
+                showToast(message, type = 'success') {
+                    const toast = document.createElement('div');
+                    toast.className = `toast ${type}`;
+                    toast.textContent = message;
+                    this.ui.toastContainer.appendChild(toast);
+                    setTimeout(() => toast.remove(), 4000);
+                },
+
+                // --- API Wrapper ---
+                async apiRequest(endpoint, options = {}) {
+                    const url = `https://api.github.com/${endpoint}`;
+                    const headers = {
+                        'Authorization': `token ${this.token}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        ...options.headers,
                     };
-                    if (data.sha) body.sha = data.sha;
-                    xhr.send(JSON.stringify(body));
-                }).catch(err => {
-                    statusDiv.textContent = `Error checking file existence: ${err.message}`;
-                    progressBar.style.display = 'none';
-                    console.error(err);
-                });
+                    
+                    try {
+                        const response = await fetch(url, { ...options, headers });
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.message || `API Error: ${response.status}`);
+                        }
+                        // Handle 204 No Content for DELETE requests
+                        return response.status === 204 ? null : response.json();
+                    } catch (error) {
+                        this.showToast(error.message, 'error');
+                        this.showLoader(false);
+                        throw error;
+                    }
+                },
+                
+                // --- Core Logic ---
+                async saveToken() {
+                    const token = this.ui.tokenInput.value.trim();
+                    if (!token) {
+                        this.showToast('Please enter a token.', 'error');
+                        return;
+                    }
+                    this.token = token;
+                    localStorage.setItem('githubToken', token);
+                    await this.fetchUserAndRepos();
+                },
+                
+                logout() {
+                    localStorage.removeItem('githubToken');
+                    this.token = null;
+                    this.user = null;
+                    this.currentRepo = null;
+                    this.showView('login');
+                },
+
+                async fetchUserAndRepos() {
+                    this.showLoader(true);
+                    try {
+                        // Fetch user info to verify token
+                        this.user = await this.apiRequest('user');
+                        document.getElementById('repo-list-title').textContent = `${this.user.login}'s Repositories`;
+
+                        // Fetch repos
+                        const repos = await this.apiRequest('user/repos?per_page=100&sort=pushed');
+                        this.ui.repoSelect.innerHTML = repos.map(repo => `<option value="${repo.full_name}">${repo.name}</option>`).join('');
+                        
+                        this.showView('repoList');
+                        this.showToast('Connected successfully!');
+                    } catch (error) {
+                        this.logout(); // Token is likely invalid, log out
+                    } finally {
+                        this.showLoader(false);
+                    }
+                },
+
+                loadSelectedRepo() {
+                    this.currentRepo = this.ui.repoSelect.value;
+                    if (!this.currentRepo) return;
+                    this.ui.repoName.textContent = this.currentRepo;
+                    this.ui.uploadRepoName.textContent = this.currentRepo.split('/')[1]; // Show only repo name
+                    this.loadTree(''); // Load root
+                },
+                
+                async loadTree(path) {
+                    this.showLoader(true);
+                    this.currentPath = path;
+                    this.ui.fileActions.classList.add('hidden'); // Hide actions on navigation
+                    
+                    try {
+                        const contents = await this.apiRequest(`repos/${this.currentRepo}/contents/${path}`);
+                        this.renderTree(contents);
+                        this.renderBreadcrumbs();
+                        this.showView('files');
+                        // Also show the upload view card below the file manager
+                        this.ui.views.upload.classList.remove('hidden');
+                    } finally {
+                        this.showLoader(false);
+                    }
+                },
+
+                renderTree(contents) {
+                    this.ui.fileTree.innerHTML = '';
+                    // Sort folders first, then files, all alphabetically
+                    contents.sort((a, b) => {
+                        if (a.type === b.type) return a.name.localeCompare(b.name);
+                        return a.type === 'dir' ? -1 : 1;
+                    });
+
+                    contents.forEach(item => {
+                        const li = document.createElement('li');
+                        li.dataset.path = item.path;
+                        li.dataset.sha = item.sha;
+                        li.dataset.type = item.type;
+                        
+                        const iconType = item.type === 'dir' ? 'folder' : 'file';
+                        li.innerHTML = `
+                            <svg><use xlink:href="#icon-${iconType}"></use></svg>
+                            <span>${item.name}</span>
+                        `;
+
+                        li.addEventListener('click', () => {
+                            if (item.type === 'dir') {
+                                this.loadTree(item.path);
+                            } else {
+                                this.selectFile(item.path, item.sha, li);
+                            }
+                        });
+                        this.ui.fileTree.appendChild(li);
+                    });
+                },
+
+                renderBreadcrumbs() {
+                    this.ui.breadcrumbs.innerHTML = '';
+                    const parts = this.currentPath.split('/').filter(Boolean);
+                    
+                    const rootEl = document.createElement('span');
+                    rootEl.textContent = 'root';
+                    rootEl.onclick = () => this.loadTree('');
+                    this.ui.breadcrumbs.appendChild(rootEl);
+
+                    let pathAccumulator = '';
+                    parts.forEach(part => {
+                        pathAccumulator += (pathAccumulator ? '/' : '') + part;
+                        const partEl = document.createElement('span');
+                        partEl.textContent = part;
+                        partEl.dataset.path = pathAccumulator;
+                        partEl.onclick = (e) => this.loadTree(e.target.dataset.path);
+                        this.ui.breadcrumbs.appendChild(partEl);
+                    });
+                },
+
+                selectFile(path, sha, element) {
+                    // Deselect previous
+                    if (this.selectedFile.element) {
+                        this.selectedFile.element.classList.remove('selected');
+                    }
+                    // Select new
+                    element.classList.add('selected');
+                    this.selectedFile = { path, sha, element };
+                    
+                    this.ui.selectedFileName.textContent = path.split('/').pop();
+                    this.ui.fileActions.classList.remove('hidden');
+                },
+
+                async deleteFile() {
+                    if (!this.selectedFile.path || !confirm(`Are you sure you want to delete ${this.selectedFile.path}?`)) {
+                        return;
+                    }
+                    this.showLoader(true);
+                    try {
+                        await this.apiRequest(`repos/${this.currentRepo}/contents/${this.selectedFile.path}`, {
+                            method: 'DELETE',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                message: `Delete file: ${this.selectedFile.path}`,
+                                sha: this.selectedFile.sha
+                            })
+                        });
+                        this.showToast('File deleted successfully.');
+                        this.loadTree(this.currentPath); // Refresh view
+                    } finally {
+                        this.showLoader(false);
+                    }
+                },
+
+                // --- Large File Upload Logic ---
+                async handleUpload() {
+                    const file = this.ui.fileInput.files[0];
+                    if (!file) {
+                        this.showToast('Please select a file.', 'error');
+                        return;
+                    }
+                    
+                    const fileName = file.name;
+                    const path = this.ui.uploadPathInput.value.trim() || (this.currentPath ? `${this.currentPath}/${fileName}` : fileName);
+                    
+                    document.getElementById('upload-btn').disabled = true;
+                    this.ui.uploadProgressBar.classList.remove('hidden');
+                    this.updateUploadProgress(0, `Starting upload for ${fileName}...`);
+                    
+                    try {
+                        // 1. Get the default branch and its latest commit SHA
+                        this.updateUploadProgress(5, 'Fetching repository details...');
+                        const repoData = await this.apiRequest(`repos/${this.currentRepo}`);
+                        this.currentBranch = repoData.default_branch;
+                        const refData = await this.apiRequest(`repos/${this.currentRepo}/git/ref/heads/${this.currentBranch}`);
+                        const latestCommitSha = refData.object.sha;
+                        const baseTreeSha = (await this.apiRequest(`repos/${this.currentRepo}/git/commits/${latestCommitSha}`)).tree.sha;
+
+                        // 2. Create a blob for the file content
+                        this.updateUploadProgress(15, 'Reading file and creating blob...');
+                        const content = await this.readFileAsBase64(file);
+                        const blobData = await this.apiRequest(`repos/${this.currentRepo}/git/blobs`, {
+                            method: 'POST',
+                            body: JSON.stringify({ content: content, encoding: 'base64' })
+                        });
+
+                        // 3. Create a new tree with the new file blob
+                        this.updateUploadProgress(50, 'Creating new file tree...');
+                        const treeData = await this.apiRequest(`repos/${this.currentRepo}/git/trees`, {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                base_tree: baseTreeSha,
+                                tree: [{
+                                    path: path,
+                                    mode: '100644', // file
+                                    type: 'blob',
+                                    sha: blobData.sha
+                                }]
+                            })
+                        });
+
+                        // 4. Create a new commit pointing to the new tree
+                        this.updateUploadProgress(75, 'Creating commit...');
+                        const commitMessage = `Upload: ${path}`;
+                        const newCommitData = await this.apiRequest(`repos/${this.currentRepo}/git/commits`, {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                message: commitMessage,
+                                tree: treeData.sha,
+                                parents: [latestCommitSha]
+                            })
+                        });
+
+                        // 5. Update the branch reference to point to the new commit
+                        this.updateUploadProgress(90, 'Finalizing push...');
+                        await this.apiRequest(`repos/${this.currentRepo}/git/refs/heads/${this.currentBranch}`, {
+                            method: 'PATCH',
+                            body: JSON.stringify({ sha: newCommitData.sha })
+                        });
+                        
+                        this.updateUploadProgress(100, 'Upload complete!');
+                        this.showToast(`${fileName} uploaded successfully!`, 'success');
+                        this.loadTree(this.currentPath); // Refresh
+                    } catch (error) {
+                         this.updateUploadProgress(0, `Upload failed.`);
+                         // Error is already shown by apiRequest
+                    } finally {
+                        document.getElementById('upload-btn').disabled = false;
+                        setTimeout(() => {
+                           this.ui.uploadProgressBar.classList.add('hidden');
+                           this.ui.uploadStatus.textContent = '';
+                        }, 3000);
+                        this.ui.fileInput.value = ''; // Reset file input
+                        this.ui.uploadPathInput.value = '';
+                    }
+                },
+                
+                readFileAsBase64(file) {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result.split(',')[1]);
+                        reader.onerror = error => reject(error);
+                        reader.readAsDataURL(file);
+                    });
+                },
+                
+                updateUploadProgress(percentage, statusText) {
+                    this.ui.uploadProgress.style.width = `${percentage}%`;
+                    this.ui.uploadStatus.textContent = statusText;
+                }
+
             };
-            reader.onerror = () => {
-                statusDiv.textContent = 'Error reading file.';
-                progressBar.style.display = 'none';
-            };
-            reader.readAsDataURL(file);
+
+            App.init();
         });
     </script>
 </body>
