@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ffffff">
+    <title>GitHub File Uploader PWA</title>
+    <link rel="manifest" href="/manifest.json">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #status {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>GitHub File Uploader</h1>
+    <p>This is a simple PWA for uploading files up to 100MB to your GitHub repositories, bypassing the 25MB web UI limit using the GitHub API.</p>
+    <p><strong>Note:</strong> You need a GitHub Personal Access Token with 'repo' scope. Create one at <a href="https://github.com/settings/tokens">github.com/settings/tokens</a>.</p>
+    
+    <label for="token">GitHub Token:</label>
+    <input type="password" id="token" placeholder="Enter your GitHub token">
+    
+    <button id="fetchRepos">Fetch My Repositories</button>
+    
+    <label for="repoSelect">Select Repository:</label>
+    <select id="repoSelect">
+        <option value="">-- Select a repo --</option>
+    </select>
+    
+    <label for="fileInput">Choose File (up to 100MB):</label>
+    <input type="file" id="fileInput">
+    
+    <label for="filePath">File Path in Repo (optional, defaults to file name):</label>
+    <input type="text" id="filePath" placeholder="e.g., folder/file.ext">
+    
+    <button id="uploadButton">Upload File</button>
+    
+    <div id="status"></div>
+
+    <script>
+        // Register service worker for PWA functionality
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker registered', reg))
+                    .catch(err => console.log('Service Worker registration failed', err));
+            });
+        }
+
+        const tokenInput = document.getElementById('token');
+        const fetchReposButton = document.getElementById('fetchRepos');
+        const repoSelect = document.getElementById('repoSelect');
+        const fileInput = document.getElementById('fileInput');
+        const filePathInput = document.getElementById('filePath');
+        const uploadButton = document.getElementById('uploadButton');
+        const statusDiv = document.getElementById('status');
+
+        // Load token from localStorage if available
+        if (localStorage.getItem('githubToken')) {
+            tokenInput.value = localStorage.getItem('githubToken');
+        }
+
+        fetchReposButton.addEventListener('click', async () => {
+            const token = tokenInput.value.trim();
+            if (!token) {
+                statusDiv.textContent = 'Please enter a GitHub token.';
+                return;
+            }
+            localStorage.setItem('githubToken', token); // Save token
+
+            statusDiv.textContent = 'Fetching repositories...';
+            try {
+                const response = await fetch('https://api.github.com/user/repos?per_page=100', {
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const repos = await response.json();
+                repoSelect.innerHTML = '<option value="">-- Select a repo --</option>';
+                repos.forEach(repo => {
+                    const option = document.createElement('option');
+                    option.value = repo.full_name;
+                    option.textContent = repo.full_name;
+                    repoSelect.appendChild(option);
+                });
+                statusDiv.textContent = 'Repositories loaded.';
+            } catch (error) {
+                statusDiv.textContent = `Error fetching repos: ${error.message}`;
+            }
+        });
+
+        uploadButton.addEventListener('click', async () => {
+            const token = tokenInput.value.trim();
+            const repo = repoSelect.value;
+            const file = fileInput.files[0];
+            const path = filePathInput.value.trim() || file?.name;
+
+            if (!token) {
+                statusDiv.textContent = 'Please enter a GitHub token.';
+                return;
+            }
+            if (!repo) {
+                statusDiv.textContent = 'Please select a repository.';
+                return;
+            }
+            if (!file) {
+                statusDiv.textContent = 'Please choose a file.';
+                return;
+            }
+            if (file.size > 100 * 1024 * 1024) {
+                statusDiv.textContent = 'File exceeds 100MB limit.';
+                return;
+            }
+
+            statusDiv.textContent = 'Preparing upload...';
+
+            try {
+                // Read file as base64
+                const base64Content = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => resolve(reader.result.split(',')[1]);
+                    reader.onerror = reject;
+                });
+
+                // Check if file exists to get SHA
+                let sha = null;
+                try {
+                    const getResponse = await fetch(`https://api.github.com/repos/${repo}/contents/${encodeURIComponent(path)}`, {
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    });
+                    if (getResponse.ok) {
+                        const data = await getResponse.json();
+                        sha = data.sha;
+                        statusDiv.textContent = 'File exists, will update.';
+                    } else if (getResponse.status !== 404) {
+                        throw new Error(`HTTP error! status: ${getResponse.status}`);
+                    }
+                } catch (error) {
+                    statusDiv.textContent = `Error checking file: ${error.message}`;
+                    return;
+                }
+
+                // Upload (create or update)
+                const uploadResponse = await fetch(`https://api.github.com/repos/${repo}/contents/${encodeURIComponent(path)}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `Upload ${path} via PWA`,
+                        content: base64Content,
+                        sha: sha // Include only if updating
+                    })
+                });
+
+                if (!uploadResponse.ok) {
+                    const errorData = await uploadResponse.json();
+                    throw new Error(errorData.message || `HTTP error! status: ${uploadResponse.status}`);
+                }
+
+                statusDiv.textContent = 'File uploaded successfully!';
+            } catch (error) {
+                statusDiv.textContent = `Error uploading file: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
