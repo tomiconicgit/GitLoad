@@ -39,8 +39,8 @@
 </head>
 <body>
     <h1>GitHub File Uploader</h1>
-    <p>This is a simple PWA for uploading files up to 100MB to your GitHub repositories, bypassing the 25MB web UI limit using the GitHub API.</p>
-    <p><strong>Note:</strong> You need a GitHub Personal Access Token with 'repo' scope. Create one at <a href="https://github.com/settings/tokens">github.com/settings/tokens</a>.</p>
+    <p>This is a simple PWA for uploading files up to 50MB (recommended for mobile) to your GitHub repositories, bypassing the 25MB web UI limit using the GitHub API.</p>
+    <p><strong>Note:</strong> You need a GitHub Personal Access Token with 'repo' scope. Create one at <a href="https://github.com/settings/tokens">github.com/settings/tokens</a>. For larger files, use Git LFS on desktop.</p>
     
     <label for="token">GitHub Token:</label>
     <input type="password" id="token" placeholder="Enter your GitHub token">
@@ -52,7 +52,7 @@
         <option value="">-- Select a repo --</option>
     </select>
     
-    <label for="fileInput">Choose File (up to 100MB):</label>
+    <label for="fileInput">Choose File (up to 50MB):</label>
     <input type="file" id="fileInput">
     
     <label for="filePath">File Path in Repo (optional, defaults to file name):</label>
@@ -115,6 +115,7 @@
                 statusDiv.textContent = 'Repositories loaded.';
             } catch (error) {
                 statusDiv.textContent = `Error fetching repos: ${error.message}`;
+                console.error(error);
             }
         });
 
@@ -136,21 +137,36 @@
                 statusDiv.textContent = 'Please choose a file.';
                 return;
             }
-            if (file.size > 100 * 1024 * 1024) {
-                statusDiv.textContent = 'File exceeds 100MB limit.';
+            if (file.size > 50 * 1024 * 1024) {
+                statusDiv.textContent = 'File exceeds 50MB limit (use Git LFS for larger files).';
                 return;
             }
 
             statusDiv.textContent = 'Preparing upload...';
 
             try {
-                // Read file as base64
-                const base64Content = await new Promise((resolve, reject) => {
+                // Read file as ArrayBuffer for better memory handling
+                const arrayBuffer = await new Promise((resolve, reject) => {
                     const reader = new FileReader();
-                    reader.readAsDataURL(file);
-                    reader.onload = () => resolve(reader.result.split(',')[1]);
-                    reader.onerror = reject;
+                    reader.readAsArrayBuffer(file);
+                    reader.onprogress = (event) => {
+                        if (event.lengthComputable) {
+                            const percent = Math.round((event.loaded / event.total) * 100);
+                            statusDiv.textContent = `Reading file: ${percent}%...`;
+                        }
+                    };
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = () => reject(reader.error);
+                    reader.onabort = () => reject(new Error('File read aborted'));
                 });
+
+                // Convert ArrayBuffer to base64 efficiently
+                const base64Content = btoa(
+                    new Uint8Array(arrayBuffer)
+                        .reduce((data, byte) => data + String.fromCharCode(byte), '')
+                );
+
+                statusDiv.textContent = 'File read complete. Checking if exists...';
 
                 // Check if file exists to get SHA
                 let sha = null;
@@ -170,8 +186,11 @@
                     }
                 } catch (error) {
                     statusDiv.textContent = `Error checking file: ${error.message}`;
+                    console.error(error);
                     return;
                 }
+
+                statusDiv.textContent = 'Uploading...';
 
                 // Upload (create or update)
                 const uploadResponse = await fetch(`https://api.github.com/repos/${repo}/contents/${encodeURIComponent(path)}`, {
@@ -195,7 +214,8 @@
 
                 statusDiv.textContent = 'File uploaded successfully!';
             } catch (error) {
-                statusDiv.textContent = `Error uploading file: ${error.message}`;
+                statusDiv.textContent = `Error during upload: ${error.message}. Try a smaller file or check console for details.`;
+                console.error(error);
             }
         });
     </script>
