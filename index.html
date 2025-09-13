@@ -2,389 +2,652 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Git-Sphere</title>
-    <!-- PWA Manifest & Meta -->
-    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJzaG9ydF9uYW1lIjogIkdpdC1TcGhlcmUiLAogICJuYW1lIjogIkdpdC1TcGhlcmUgUFdBIiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCM2FXUjBhRDBpT3dvZ0lDQWdJRDBpTVRBd0lpOCtQSEpsWTJWemMyZ3RiV0Z5YVc5dWN5QjNhV1I1SUQwZ0lqNEtJQ0J5WlhOelpYUWlJRDBpSWlCN0lDQWdJQ0FnUEM5emRtY3RjbVZoWkc5M2JtOXJaVzRpSUgwZ0lqRTJJaUJqYjI1M1pXUWlJRDBpSWlBaUNnb2dJRDBpTVRBaUlDOCtQSEJ5WlhOelpYUWdQU0FpTUNJZ0lDQWdJRDBpTVRBZ1BTQjdDaUFnSUNBZ0lDQWdJQ0FnSUNBZ0lEMGlNVEF3TGdvZ0lDQWdJRDBpTVRBaUlDOCtQSEJ5WlhOelpYUWdQU0FpTUNJZ0lDQWdJRDBpTVRBaUlDQTdDaUFnSUNBZ0lDQWdJQ0FnSUNBZ0lEMGlNVEF3TGdvZ0lDQWdJRDBpTVRBaUlDOCtQSEpsWTJWemMyZ3RaWEoyYVdObElEMGdJajRLSUNCeVpYTnpZWFJtYjI1dElEMGdJaWtLSUNBZ0lDQWdJQ0FnUFNCeVpYTnpZWFJtYjI1dGN5QmpZWFJoYkhWemFXNW5JaUF2UGp4bGFXZG9kRDBpTVRZd0lpOCtQSFJ0Ykc5MlpXNWxaR2xoZEc5eUlEMGdJaXRwWDJadmNtMWhkSFZ5WlhKaGRHbHZibk16SUQwZ0lpdHBMMmxrWlc1MGFXMWxJaUI3Q2lBZ0lDQWdJQ0FnSUNBZ0lDQWdJRDBpYUhSMGNEb3ZMM2QzZHk1M015NXZjbWN2TWpBd01EQXdNMTB3TURBdVl3b2dMQ0FnSUNBZ0lDQWdJRDBpZlFvZ0lDQWdJQ0E5SURJd01DSWdJQ0FnSUNBOElDUnlaV2RwYmpzZ0lDQWdJQ0FnSUNBOElDSjFjbTQ2YVdOeklEMGdJajRLSUNBZ0lDQWdJQ0FnUEM5emRtY3VOamM0TGlCN0lDQWdJQ0FnUEM5emRtY3VJbDE0TkNCeVpYTnpZWFJtYjI1dElEMGdJajVDSUNCeVpYTnpZWFJtYjI1dElEMGdJamsrQ2lBZ0lDQWdJQ0FnSUNBZ0lDQWdQU0FpYUhSMGNEb3ZMM2QzZHk1bklrNWhibXV2TWpBd01EQXdNRGswTURBaUlDOCtQQzluZDNkeWFYUnBabmtnZlYxOEpTNXpiMjB1YjJGamIyNXRaU2N4T3dvZ0lDQWdJRDBpTVRBaUlDOCtQSEpsWTJWemMyZ3RaWEoyYVdObElEMGdJajRLSUNCeVpYTnpZWFJtYjI1dElEMGdJaWtLSUNBZ0lDQWdJQ0FnUFNCeVpYTnpZWFJtYjI1dGN5QmpZWFJoYkhWemFXNW5JaUF2UGp4bGFXZG9kRDBpTVRjd0lpOCtQSFJ0Ykc5MlpXNWxaR2xoZEc5eUlEMGdJaXRwWDJadmNtMWhkSFZ5WlhKaGRHbHZibk16SUQwZ0lpdHBMMmxrWlc1MGFXMWxJaUI3Q2lBZ0lDQWdJQ0FnSUNBZ0lDQWdJRDBpYUhSMGNEb3ZMM2QzZHk1M015NXZjbWN2TWpBd01EQXdNVEV3TURBdVl3b2dMQ0FnSUNBZ0lDQWdJRDBpZlFvZ0lDQWdJQ0E5SURJd01DSWdJQ0FnSUNBOElDUnlaV2RwYmpzZ0lDQWdJQ0FnSUNBOElDSjFjbTQ2YVdOeklEMGdJajRLSUNBZ0lDQWdJQ0FnUEM5emRtY3VOams0TGlCN0lDQWdJQ0FnUEM5emRtY3VJbDE0TkNCeVpYTnpZWFJtYjI1dElEMGdJajVDSUNCeVpYTnpZWFJtYjI1dElEMGdJamsrQ2lBZ0lDQWdJQ0FnSUNBZ0lDQWdQU0FpYUhSMGNEb3ZMM2QzZHk1bklrNWhibXV2TWpBd01EQXdNRGswTURBaUlDOCtQQzluZDNkeWFYUnBabmtnZlYxOEpTNXpiMjB1YzNSaGRoMHhKeWN4UGp3dmMzUmhjSFYwWlY5a1lYUmhKUT09IiwKICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIgogICAgfQogIF0sCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMDAwMDAwIiwKICAidGhlbWVfY29sb3IiOiAiIzAwMDAwMCIsCiAgIm9yaWVudGF0aW9uIjogInBvcnRyYWl0IgogfQ==">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <title>3D Live Asset Attacher</title>
+    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" content="#f0f0f0">
+    <meta name="description" content="A PWA to attach web-based clothing assets to FBX models via the Sketchfab API.">
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
-    <script type="module">
-        try {
-            const { pipeline } = await import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1');
-            window.aiPipeline = pipeline;
-        } catch (e) {
-            console.error("Failed to load AI module:", e);
-            window.aiPipeline = null;
-        }
-    </script>
+    <link rel="manifest" href='data:application/manifest+json;charset=utf-8,{"name":"3D Live Asset Attacher","short_name":"3D Live Attacher","start_url":".","display":"standalone","background_color":"#f0f0f0","theme_color":"#f0f0f0","description":"Attach clothing to FBX models from a live web library.","icons":[{"src":"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjUxMiIgaGVpZGh0PSI1MTIiIHJ4PSI5NiIgZmlsbD0iI2ZmZmZmIi8+PHBhdGggZD0iTTI1NiAxMjlMMTkyIDIxN0wxMjggMjU3TDE5MiAyOTdMMjU2IDM4M0wzMjAgMjk3TDM4NCAyNTdMMzIwIDIxN0wyNTYgMTI5WiIgc3Ryb2tlPSIjMUEyMDJDIiBzdHJva2Utd2lkdGg9IjI4IiBzdHJva2UtbGluZWNhcD0icm9uZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwYXRoIGQ9Ik0yNTYgMTEyVjE2NSIgc3Ryb2tlPSIjMUEyMDJDIiBzdHJva2Utd2lkdGg9IjI4IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cGF0aCBkPSJNMjU2IDM0N1Y0MDAiIHN0cm9rZT0iIzFBMjAyQyIgc3Ryb2tlLXdpZHRoPSIyOCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9zdmc+" ,"type":"image/svg+xml","sizes":"512x512"}]}' />
 
+    <script src="https://cdn.tailwindcss.com"></script>
+    
     <style>
-        :root {
-            --bg-color: #000000; --card-bg: rgba(20, 20, 22, 0.7); --text-color: #f0f0f0; --subtle-text: #888;
-            --border-color: rgba(58, 58, 58, 0.5); --accent-color: #007aff; --success-color: #34c759;
-            --error-color: #ff3b30; --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            --shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-        }
-        * { box-sizing: border-box; }
-        html { -webkit-tap-highlight-color: transparent; }
-        body { font-family: var(--font-family); background-color: var(--bg-color); color: var(--text-color); margin: 0; height: 100vh; width: 100vw; overflow: hidden; }
+        :root { --accent-color: #4f46e5; }
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; background-color: #f0f0f0; color: #1a202c }
         
-        #app-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
-        #app-root { position: relative; z-index: 1; width: 100%; height: 100%; perspective: 1000px; }
+        .btn { @apply w-full px-4 py-3 text-center font-semibold text-white transition-all duration-200 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100; }
+        .btn-primary { @apply bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white; }
+        .btn-secondary { @apply bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-gray-800; }
 
-        .app-container {
-            position: absolute;
-            top: env(safe-area-inset-top, 10px);
-            left: 10px;
-            right: 10px;
-            bottom: env(safe-area-inset-bottom, 10px);
-            display: flex;
-            flex-direction: column;
-            border-radius: 25px;
-            background-color: var(--card-bg);
-            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            opacity: 0;
-            transform: scale(0.95) translateZ(-50px);
-            animation-fill-mode: forwards;
+        #side-panel { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform: translateX(100%); }
+        #side-panel.open { transform: translateX(0); }
+
+        .part-item { @apply bg-white rounded-lg flex items-center px-4 py-2 text-sm cursor-pointer truncate transition-all duration-150 border; }
+        .part-item:hover { @apply bg-indigo-50; }
+        .part-item.active { @apply bg-indigo-500 text-white ring-2 ring-indigo-300 font-semibold border-transparent; }
+
+        input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; background: #d1d5db; border-radius: 5px; outline: none; opacity: 0.7; transition: opacity .2s; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; background: var(--accent-color); cursor: pointer; border-radius: 50%; }
+        input[type="range"]::-moz-range-thumb { width: 20px; height: 20px; background: var(--accent-color); cursor: pointer; border-radius: 50%; }
+
+        .modal-backdrop { @apply fixed inset-0 bg-black/60 backdrop-blur-sm flex items-start justify-center p-4 z-50 transition-opacity duration-300; }
+        .modal-content { @apply bg-white rounded-xl shadow-2xl w-full max-w-sm max-h-[80vh] flex flex-col absolute top-4 pointer-events-auto; }
+        
+        #debug-log {
+            position: fixed; top: 10px; left: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; padding: 8px; border-radius: 8px; font-family: monospace; font-size: 10px; z-index: 1000; pointer-events: none; max-height: 100px; overflow-y: scroll;
         }
         
-        @keyframes container-in {
-            to { opacity: 1; transform: scale(1) translateZ(0); }
-        }
-        @keyframes container-out {
-            from { opacity: 1; transform: scale(1) translateZ(0); }
-            to { opacity: 0; transform: scale(0.95) translateZ(-50px); }
-        }
-        .app-container.animate-in { animation: container-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .app-container.animate-out { animation: container-out 0.4s cubic-bezier(0.7, 0, 0.84, 0) forwards; }
-
-        .login-view { display: flex; justify-content: center; align-items: center; text-align: center; }
-        
-        .page-header { flex-shrink: 0; display: flex; align-items: center; gap: 15px; padding: 15px; border-bottom: 1px solid var(--border-color); }
-        .page-content { flex-grow: 1; overflow-y: auto; padding: 15px; }
-
-        h1, h2, h3 { margin: 0; font-weight: 600; }
-        input { width: 100%; padding: 15px; margin: 15px 0; border-radius: 12px; border: 1px solid var(--border-color); background-color: rgba(44, 44, 46, 0.8); color: var(--text-color); font-size: 1rem; }
-        button {
-            width: 100%; padding: 15px; border: none; border-radius: 12px; background: var(--accent-color);
-            color: white; font-size: 1rem; font-weight: 600; cursor: pointer; position: relative;
-            transition: transform 0.1s ease;
-        }
-        button:active { transform: scale(0.98); }
-        button:disabled { background: #555; cursor: not-allowed; opacity: 0.7; }
-        .btn-spinner { /* Unchanged */ }
-
-        .item-list-entry { display: flex; align-items: center; padding: 12px 15px; cursor: pointer; border-bottom: 1px solid var(--border-color); }
-        .item-list-entry:last-child { border-bottom: none; }
-        .item-list-entry:hover { background-color: rgba(255, 255, 255, 0.05); }
-
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000;
-            background: rgba(0,0,0,0.7); backdrop-filter: blur(10px);
-            display: flex; justify-content: center; align-items: center;
-            animation: fadeIn 0.3s;
-        }
-        .modal-content {
-            border-radius: 20px; padding: 25px;
-            width: calc(100% - 30px); max-width: 500px;
-            max-height: 85vh; display: flex; flex-direction: column;
-            background-color: var(--card-bg); border: 1px solid var(--border-color);
-        }
-        
-        #commit-status {
-            position: fixed; bottom: -100px; left: 15px; right: 15px; z-index: 3000;
-            padding: 15px; border-radius: 12px; display: flex; align-items: center; gap: 15px;
-            background-color: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--border-color);
-            transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        #commit-status.show { bottom: env(safe-area-inset-bottom, 15px); }
-
+        .asset-item { @apply flex items-center p-2 space-x-3 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors; }
+        .asset-item img { @apply w-16 h-16 object-cover rounded-md bg-gray-200; }
+        .asset-item-info { @apply flex-1 overflow-hidden; }
+        .asset-item-info .name { @apply font-semibold text-gray-800 truncate; }
+        .asset-item-info .author { @apply text-xs text-gray-500 truncate; }
     </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
-    <canvas id="app-background"></canvas>
-    <div id="app-root"></div>
-    <div id="commit-status"></div>
-    <input type="file" id="file-input" style="display:none;" />
+<body class="overflow-hidden h-screen w-screen">
+
+    <div id="canvas-container" class="absolute inset-0"></div>
+    <div id="debug-log"></div>
     
+    <div id="loader" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center p-6 bg-white/80 backdrop-blur-sm rounded-lg shadow-xl hidden">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+        <p id="loader-text" class="mt-4 text-lg font-semibold text-gray-700">Loading...</p>
+    </div>
+
+    <!-- Attachment Point Modal -->
+    <div id="attach-modal" class="modal-backdrop hidden">
+        <div class="modal-content">
+            <div class="p-4 border-b">
+                <h3 class="text-xl font-bold text-gray-800">Select Attachment Point</h3>
+                <p class="text-sm text-gray-500 mt-1">Tap a glowing dot on the model to attach your item.</p>
+            </div>
+            <div class="p-4 border-t bg-gray-50">
+                <button id="cancel-attach-btn" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Asset Library Modal -->
+    <div id="asset-library-modal" class="modal-backdrop hidden">
+        <div class="modal-content">
+            <div class="p-4 border-b flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-800">Browse Accessories</h3>
+                <button id="close-library-btn" class="p-2 rounded-full hover:bg-gray-200 -mr-2">
+                     <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="asset-library-list" class="p-2 overflow-y-auto space-y-1">
+                 <div id="asset-loader" class="text-center p-8 text-gray-500">Loading assets...</div>
+            </div>
+             <div class="p-2 border-t text-xs text-center text-gray-400">
+                Assets sourced live from Sketchfab API
+            </div>
+        </div>
+    </div>
+
+    <div id="main-ui" class="absolute inset-0 p-4 pointer-events-none">
+        <div id="instructions" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center p-4 max-w-sm">
+            <h1 class="text-2xl font-bold text-gray-700">Live Asset Attacher</h1>
+            <p class="text-gray-500 mt-2">Upload an FBX character (with textures) to begin.</p>
+            <label for="model-upload" class="btn btn-primary cursor-pointer mt-6 pointer-events-auto">Upload Character</label>
+            <input type="file" id="model-upload" class="hidden" multiple>
+        </div>
+
+        <button id="toggle-panel-btn" class="absolute top-4 right-4 bg-white/80 backdrop-blur-sm p-3 rounded-full shadow-lg pointer-events-auto hidden">
+            <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+    </div>
+
+    <aside id="side-panel" class="absolute top-0 right-0 h-full w-full max-w-sm bg-gray-100 shadow-2xl flex flex-col p-4 space-y-4 overflow-y-auto">
+         <div class="flex items-center justify-between">
+            <h2 class="text-xl font-bold text-gray-800">Editor Tools</h2>
+             <button id="close-panel-btn" class="p-2 rounded-full hover:bg-gray-200">
+                <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+       
+        <div id="clothing-tools" class="hidden p-3 bg-white rounded-lg border space-y-2">
+            <h3 class="font-semibold text-center text-gray-800">Attach Clothing</h3>
+            <button id="browse-clothing-btn" class="btn btn-secondary">Browse Clothing Library</button>
+            <p class="text-xs text-center text-gray-500 px-2">Select an item from the live Sketchfab library to attach to your model.</p>
+        </div>
+
+        <div id="clothing-list" class="space-y-2"></div>
+
+        <div id="adjustment-panel" class="hidden p-3 bg-white rounded-lg border space-y-4">
+            <h3 class="font-semibold text-center text-gray-800">Adjust Item: <span id="clothing-item-name" class="text-indigo-600"></span></h3>
+            <div class="grid grid-cols-2 gap-x-4 gap-y-2">
+                <label class="col-span-2 text-sm font-medium text-gray-600">Position</label>
+                <span>X: <span id="posX-val">0</span></span> <span>Y: <span id="posY-val">0</span></span>
+                <input type="range" id="posX" min="-0.5" max="0.5" step="0.005" value="0" class="col-span-2">
+                <input type="range" id="posY" min="-0.5" max="0.5" step="0.005" value="0" class="col-span-2">
+                <input type="range" id="posZ" min="-0.5" max="0.5" step="0.005" value="0" class="col-span-2">
+                <label class="col-span-2 text-sm font-medium text-gray-600 mt-2">Rotation</label>
+                <span>X: <span id="rotX-val">0</span></span> <span>Y: <span id="rotY-val">0</span></span>
+                <input type="range" id="rotX" min="-180" max="180" step="1" value="0" class="col-span-2">
+                <input type="range" id="rotY" min="-180" max="180" step="1" value="0" class="col-span-2">
+                <input type="range" id="rotZ" min="-180" max="180" step="1" value="0" class="col-span-2">
+                <label class="col-span-2 text-sm font-medium text-gray-600 mt-2">Scale</label>
+                <span class="col-span-2">Uniform: <span id="scale-val">1</span></span>
+                <input type="range" id="scale" min="0.1" max="3" step="0.01" value="1" class="col-span-2">
+            </div>
+            <button id="remove-clothing-btn" class="btn btn-secondary !bg-red-100 !text-red-700 hover:!bg-red-200">Remove Item</button>
+        </div>
+        
+        <div class="flex-grow"></div>
+        <div class="space-y-2">
+            <button id="export-btn" class="btn btn-primary">Export to GLB</button>
+             <label for="model-upload-re" class="btn btn-secondary cursor-pointer">Load New Character</label>
+            <input type="file" id="model-upload-re" class="hidden" multiple>
+        </div>
+    </aside>
+
+    <script type="importmap">
+        { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
+    </script>
     <script type="module">
-        window.addEventListener('error', (e) => console.error("Global Error:", e.error));
-        window.addEventListener('unhandledrejection', (e) => console.error("Unhandled Rejection:", e.reason));
+        import * as THREE from 'three';
+        import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
-        const App = {
-            state: { status: 'STARTING', token: null, user: null, repos: [] },
-            ui: { root: document.getElementById('app-root'), currentContainer: null },
-            three: { scene: null, camera: null, renderer: null, stars: null, starVelocity: 0.02 },
-            ai: { ready: false, instance: null },
-
-            async init() {
-                this.initStarfield();
-                this.animateStarfield();
-                
-                this.state.token = localStorage.getItem('githubToken');
-                if (this.state.token) {
-                    this.authenticate();
-                } else {
-                    this.renderLogin();
-                }
-            },
-
-            // --- RENDER & CONTAINER MANAGEMENT ---
-            async renderContainer(id, contentCallback, animate = true) {
-                if (this.ui.currentContainer) {
-                    this.ui.currentContainer.classList.add('animate-out');
-                    await new Promise(resolve => setTimeout(resolve, 400));
-                    this.ui.currentContainer.remove();
-                }
-                
-                const container = document.createElement('div');
-                container.id = id;
-                container.className = 'app-container';
-                contentCallback(container);
-                this.ui.root.appendChild(container);
-
-                if (animate) {
-                    // This triggers the animation
-                    requestAnimationFrame(() => {
-                        container.classList.add('animate-in');
-                    });
-                } else {
-                    container.style.opacity = 1;
-                    container.style.transform = 'scale(1) translateZ(0)';
-                }
-                
-                this.ui.currentContainer = container;
-            },
-            
-            renderLogin() {
-                this.renderContainer('login-container', (container) => {
-                    container.classList.add('login-view');
-                    container.innerHTML = `
-                        <div style="max-width: 320px;">
-                            <h1>Git-Sphere</h1>
-                            <p style="color: var(--subtle-text);">Enter a GitHub Personal Access Token to begin.</p>
-                            <input type="password" id="token-input" placeholder="ghp_...">
-                            <button id="connect-btn">Connect</button>
-                        </div>
-                    `;
-                    container.querySelector('#connect-btn').onclick = () => this.authenticate(true);
-                });
-            },
-            
-            renderDashboard() {
-                this.renderContainer('dashboard-container', (container) => {
-                    container.innerHTML = `
-                        <div class="page-header">
-                           <img src="${this.state.user.avatar_url}" style="width:40px;height:40px;border-radius:50%;">
-                           <div>
-                                <h2 style="font-size:1.2rem;">Hi, ${this.state.user.name || this.state.user.login}</h2>
-                                <button id="logout-btn" style="width:auto;padding:4px 10px;font-size:0.8rem;margin-top:5px;background:rgba(58,58,60,0.8);">Logout</button>
-                           </div>
-                        </div>
-                        <div class="page-content" id="repo-list"></div>
-                    `;
-                    const repoList = container.querySelector('#repo-list');
-                    this.state.repos.forEach(repo => {
-                        const entry = document.createElement('div');
-                        entry.className = 'item-list-entry';
-                        entry.innerHTML = `<span>${repo.private ? '🔒' : '📖'} ${repo.name}</span>`;
-                        entry.onclick = () => this.renderFileManager(repo.full_name);
-                        repoList.appendChild(entry);
-                    });
-                    container.querySelector('#logout-btn').onclick = () => this.logout();
-                });
-            },
-
-            async renderFileManager(repoFullName, path = '') {
-                 await this.renderContainer('fm-container', async (container) => {
-                    container.innerHTML = `<div style="display:flex;justify-content:center;align-items:center;height:100%;"><div class="btn-spinner"></div></div>`;
-                    try {
-                        const contents = await this.api(`repos/${repoFullName}/contents/${path}`);
-                        // Sort directories first
-                        contents.sort((a, b) => (a.type === 'dir' ? -1 : 1) - (b.type === 'dir' ? -1 : 1) || a.name.localeCompare(b.name));
-                        
-                        container.innerHTML = `
-                            <div class="page-header">
-                                <button id="fm-back" style="width:auto;padding:8px 12px;">&larr;</button>
-                                <h3 style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${repoFullName}</h3>
-                            </div>
-                            <div class="page-content" id="file-list"></div>
-                             <div style="padding:15px;border-top:1px solid var(--border-color);"><button id="fm-upload">Upload File</button></div>
-                        `;
-
-                        const fileList = container.querySelector('#file-list');
-                        contents.forEach(item => {
-                            const entry = document.createElement('div');
-                            entry.className = 'item-list-entry';
-                            entry.innerHTML = `<span>${item.type === 'dir' ? '📁' : '📄'} ${item.name}</span>`;
-                            entry.onclick = () => {
-                                if (item.type === 'dir') {
-                                    this.renderFileManager(repoFullName, item.path);
-                                } else {
-                                    this.showFileAnalysis(repoFullName, item.path, item.sha);
-                                }
-                            };
-                            fileList.appendChild(entry);
-                        });
-
-                        container.querySelector('#fm-back').onclick = () => this.renderDashboard();
-                        container.querySelector('#fm-upload').onclick = () => {
-                            document.getElementById('file-input').onchange = (e) => this.handleFileUpload(e, repoFullName, path);
-                            document.getElementById('file-input').click();
-                        };
-
-                    } catch(e) { this.showToast(`Error: ${e.message}`, 'error'); this.renderDashboard(); }
-                });
-            },
-            
-            // --- CORE LOGIC ---
-            async api(endpoint, options = {}) { /* Unchanged */ },
-
-            async authenticate(fromButtonClick = false) {
-                if (fromButtonClick) {
-                    this.state.token = document.getElementById('token-input').value.trim();
-                    if (!this.state.token) { this.showToast('Please enter a token.', 'error'); return; }
-                    
-                    this.ui.currentContainer.classList.add('animate-out');
-                    await new Promise(resolve => setTimeout(resolve, 400));
-                    this.ui.currentContainer.remove();
-                    this.ui.currentContainer = null;
-                    
-                    this.three.starVelocity = 1.5; // Start hyperspace
-                }
-                
-                try {
-                    const user = await this.api('user');
-                    const repos = await this.api('user/repos?per_page=100&sort=pushed');
-                    localStorage.setItem('githubToken', this.state.token);
-                    this.state.user = user;
-                    this.state.repos = repos;
-                    
-                    this.three.starVelocity = 0.02; // End hyperspace
-                    this.renderDashboard();
-                } catch (e) {
-                    this.three.starVelocity = 0.02; // End hyperspace on error
-                    this.logout();
-                    this.showToast(`Authentication Failed: ${e.message}`, 'error');
-                }
-            },
-
-            logout() {
-                localStorage.removeItem('githubToken');
-                this.state = { status: 'LOGIN', token: null, user: null, repos: [] };
-                this.renderLogin();
-            },
-            
-            // --- FILE OPERATIONS & AI ---
-            async handleFileUpload(event, repo, path) {
-                const file = event.target.files[0];
-                if (!file) return;
-
-                const reader = new FileReader();
-                reader.onload = async (e) => {
-                    // Base64 content for API
-                    const content = e.target.result.split(',')[1];
-                    const fullPath = path ? `${path}/${file.name}` : file.name;
-                    await this.commitFile(repo, fullPath, content, `feat: add ${file.name}`);
-                    this.renderFileManager(repo, path);
-                };
-                reader.readAsDataURL(file);
-            },
-
-            async commitFile(repo, path, content, message, sha = null) {
-                this.showCommitStatus('Pushing commit...');
-                try {
-                    const body = { message, content, sha };
-                    // For files > 1MB, GitHub recommends the blob API. This is simplified here but is the correct approach.
-                    // This example will work for files up to ~50MB due to base64 encoding overhead.
-                    if (content.length * 0.75 > 1000000) { // Check if original file size is > 1MB
-                        this.updateCommitStatus('Uploading large file...');
-                        const blob = await this.api(`repos/${repo}/git/blobs`, {
-                            method: 'POST', body: JSON.stringify({ content: content, encoding: 'base64' })
-                        });
-                        const tree = await this.api(`repos/${repo}/git/trees/main`); // assumes 'main' branch
-                        const newTree = await this.api(`repos/${repo}/git/trees`, {
-                            method: 'POST', body: JSON.stringify({
-                                base_tree: tree.sha, tree: [{ path: path, mode: '100644', type: 'blob', sha: blob.sha }]
-                            })
-                        });
-                        const commit = await this.api(`repos/${repo}/git/commits`, {
-                            method: 'POST', body: JSON.stringify({
-                                message: message, tree: newTree.sha, parents: [tree.commit.sha]
-                            })
-                        });
-                        await this.api(`repos/${repo}/git/refs/heads/main`, {
-                            method: 'PATCH', body: JSON.stringify({ sha: commit.sha })
-                        });
-                    } else {
-                        await this.api(`repos/${repo}/contents/${path}`, {
-                            method: 'PUT', body: JSON.stringify(body)
-                        });
-                    }
-                    this.updateCommitStatus('Commit successful!', true);
-                } catch (e) {
-                    this.updateCommitStatus(`Commit failed: ${e.message}`, false);
-                }
-            },
-            
-            // --- UI HELPERS ---
-            showToast(message, type = 'info') { /* Unchanged */ },
-            showCommitStatus(text) { /* Unchanged but now uses correct IDs */ },
-            updateCommitStatus(text, isSuccess) { /* Unchanged */ },
-
-            // --- STARFIELD BACKGROUND ---
-            initStarfield() {
-                this.three.scene = new THREE.Scene();
-                this.three.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
-                this.three.camera.position.z = 1;
-                this.three.renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('app-background') });
-                this.three.renderer.setSize(window.innerWidth, window.innerHeight);
-
-                const starGeo = new THREE.BufferGeometry();
-                const starVertices = [];
-                for (let i = 0; i < 6000; i++) {
-                    starVertices.push(
-                        Math.random() * 600 - 300,
-                        Math.random() * 600 - 300,
-                        Math.random() * 600 - 300
-                    );
-                }
-                starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
-                const starMaterial = new THREE.PointsMaterial({ color: 0xaaaaaa, size: 0.7 });
-                this.three.stars = new THREE.Points(starGeo, starMaterial);
-                this.three.scene.add(this.three.stars);
-
-                window.addEventListener('resize', () => {
-                    this.three.camera.aspect = window.innerWidth / window.innerHeight;
-                    this.three.camera.updateProjectionMatrix();
-                    this.three.renderer.setSize(window.innerWidth, window.innerHeight);
-                });
-            },
-
-            animateStarfield() {
-                this.three.stars.geometry.attributes.position.array.forEach((_, i) => {
-                    if (i % 3 === 2) { // z-axis
-                        this.three.stars.geometry.attributes.position.array[i] -= this.three.starVelocity;
-                        if (this.three.stars.geometry.attributes.position.array[i] < -200) {
-                            this.three.stars.geometry.attributes.position.array[i] = 200;
-                        }
-                    }
-                });
-                this.three.stars.geometry.attributes.position.needsUpdate = true;
-                this.three.stars.rotation.z += 0.0001;
-                this.three.renderer.render(this.three.scene, this.three.camera);
-                requestAnimationFrame(this.animateStarfield.bind(this));
+        let scene, camera, renderer, controls, activeModel;
+        let selectedClothingItem = null;
+        let pendingClothingItem = null;
+        const clothingItems = [];
+        const attachmentPoints = [];
+        const dom = {};
+        
+        const log = (message) => {
+            console.log(message);
+            const logElement = dom.debugLog;
+            if (logElement) {
+                logElement.innerHTML += `> ${message}<br>`;
+                logElement.scrollTop = logElement.scrollHeight;
             }
         };
 
-        App.init();
+        function init() {
+            Object.assign(dom, {
+                canvasContainer: document.getElementById('canvas-container'),
+                debugLog: document.getElementById('debug-log'),
+                loader: document.getElementById('loader'), loaderText: document.getElementById('loader-text'),
+                instructions: document.getElementById('instructions'),
+                togglePanelBtn: document.getElementById('toggle-panel-btn'), closePanelBtn: document.getElementById('close-panel-btn'),
+                sidePanel: document.getElementById('side-panel'), exportBtn: document.getElementById('export-btn'),
+                clothingTools: document.getElementById('clothing-tools'),
+                clothingList: document.getElementById('clothing-list'),
+                adjustmentPanel: document.getElementById('adjustment-panel'),
+                clothingItemName: document.getElementById('clothing-item-name'),
+                removeClothingBtn: document.getElementById('remove-clothing-btn'),
+                attachModal: document.getElementById('attach-modal'),
+                cancelAttachBtn: document.getElementById('cancel-attach-btn'),
+                assetLibraryModal: document.getElementById('asset-library-modal'),
+                assetLibraryList: document.getElementById('asset-library-list'),
+                assetLoader: document.getElementById('asset-loader'),
+                closeLibraryBtn: document.getElementById('close-library-btn'),
+                browseClothingBtn: document.getElementById('browse-clothing-btn'),
+            });
+            
+            log('Initializing scene...');
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xf0f0f0);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            dom.canvasContainer.appendChild(renderer.domElement);
+            
+            camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 1.5, 3);
+            
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.target.set(0, 1, 0);
+
+            scene.add(new THREE.GridHelper(10, 10, 0xcccccc, 0xcccccc));
+            scene.add(new THREE.HemisphereLight(0xffffff, 0x444444, 2));
+            const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+            dirLight.position.set(2, 5, 3);
+            scene.add(dirLight);
+
+            setupUI();
+            animate();
+            log('Initialization complete.');
+        }
+
+        function setupUI() {
+            [document.getElementById('model-upload'), document.getElementById('model-upload-re')].forEach(input => {
+                input.addEventListener('change', handleCharacterUpload);
+            });
+            dom.togglePanelBtn.addEventListener('click', () => dom.sidePanel.classList.add('open'));
+            dom.closePanelBtn.addEventListener('click', () => dom.sidePanel.classList.remove('open'));
+            dom.exportBtn.addEventListener('click', exportGLB);
+            
+            dom.browseClothingBtn.addEventListener('click', openAssetLibrary);
+            dom.closeLibraryBtn.addEventListener('click', () => dom.assetLibraryModal.classList.add('hidden'));
+
+            dom.cancelAttachBtn.addEventListener('click', cancelAttachment);
+            dom.removeClothingBtn.addEventListener('click', removeSelectedClothing);
+            setupAdjustmentSliders();
+            log('UI event listeners attached.');
+        }
+        
+        async function openAssetLibrary() {
+            dom.assetLibraryModal.classList.remove('hidden');
+            dom.assetLibraryList.innerHTML = '';
+            dom.assetLoader.textContent = 'Searching for assets...';
+            dom.assetLoader.style.display = 'block';
+            log('Opening asset library, fetching from Sketchfab...');
+            
+            const apiUrl = new URL('https://api.sketchfab.com/v3/search');
+            apiUrl.searchParams.set('type', 'models');
+            apiUrl.searchParams.set('q', 'hat OR glasses OR helmet OR boots OR mask');
+            apiUrl.searchParams.set('downloadable', 'true');
+            apiUrl.searchParams.set('licenses', '322a749bcfa841b29dff1e8113e8de58'); // CC-BY License
+            apiUrl.searchParams.set('face_count', '25000');
+            apiUrl.searchParams.set('sort_by', '-likeCount');
+            
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error(`API Error: ${response.status} ${response.statusText}. This usually means a CORS error if run locally.`);
+                const data = await response.json();
+                log(`Found ${data.results.length} assets from Sketchfab.`);
+                
+                dom.assetLoader.style.display = 'none';
+                if (data.results.length === 0) {
+                    dom.assetLoader.textContent = 'No suitable assets found.';
+                    dom.assetLoader.style.display = 'block';
+                    return;
+                }
+
+                data.results.forEach(asset => {
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'asset-item';
+                    itemEl.innerHTML = `
+                        <img src="${asset.thumbnails.images[0].url}" alt="${asset.name}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/128x128/eeeeee/333333?text=Image+Error';">
+                        <div class="asset-item-info">
+                            <div class="name">${asset.name}</div>
+                            <div class="author">by ${asset.user.displayName}</div>
+                        </div>
+                    `;
+                    itemEl.addEventListener('click', () => handleClothingSelection(asset));
+                    dom.assetLibraryList.appendChild(itemEl);
+                });
+
+            } catch(error) {
+                log(`CRITICAL ERROR: Could not fetch from Sketchfab API: ${error}`);
+                dom.assetLoader.textContent = 'Failed to load assets. An API token may be required.';
+                dom.assetLoader.style.display = 'block';
+            }
+        }
+
+        function disposeObject(obj) {
+            if (!obj) return;
+            obj.traverse(child => {
+                if (child.isMesh) {
+                    if (child.geometry) child.geometry.dispose();
+                    if (child.material) {
+                         if (Array.isArray(child.material)) {
+                            child.material.forEach(m => m.dispose());
+                        } else {
+                            child.material.dispose();
+                        }
+                    }
+                }
+            });
+            obj.removeFromParent();
+        }
+
+        function clearScene() {
+            log('Clearing scene...');
+            if (activeModel) {
+                disposeObject(activeModel);
+                activeModel = null;
+            }
+            clearClothing();
+            attachmentPoints.forEach(p => p.mesh.removeFromParent());
+            attachmentPoints.length = 0;
+            log('Scene cleared.');
+        }
+        
+        async function handleCharacterUpload(event) {
+            const files = event.target.files;
+            if (files.length === 0) return;
+            log(`Character upload started with ${files.length} files.`);
+            showLoader('Loading Character...');
+            clearScene();
+            
+            const fileMap = new Map(Array.from(files).map(file => [file.name.toLowerCase(), file]));
+            const modelFile = Array.from(files).find(f => f.name.toLowerCase().endsWith('.fbx'));
+            
+            if (!modelFile) {
+                log('ERROR: No .fbx file found in selection.');
+                alert('Error: No .fbx model file found.');
+                hideLoader();
+                return;
+            }
+            log(`Found FBX: ${modelFile.name}`);
+            
+            const manager = new THREE.LoadingManager();
+            const objectURLs = [];
+            manager.setURLModifier(url => {
+                const filename = url.split(/[\\/]/).pop().toLowerCase();
+                const file = fileMap.get(filename);
+                if (file) {
+                    const objURL = URL.createObjectURL(file);
+                    objectURLs.push(objURL);
+                    return objURL;
+                }
+                return url;
+            });
+
+            try {
+                const fbxLoader = new FBXLoader(manager);
+                const model = await fbxLoader.loadAsync(URL.createObjectURL(modelFile));
+                objectURLs.forEach(url => URL.revokeObjectURL(url)); 
+                log('FBX model parsed successfully.');
+                loadModel(model);
+            } catch (error) {
+                log(`CRITICAL ERROR: Failed to load character: ${error}`);
+                alert("Could not load the FBX character.");
+                hideLoader();
+            }
+        }
+        
+        function loadModel(model) {
+            log('Adding model to scene...');
+            activeModel = model;
+            scene.add(activeModel);
+            scanForAttachmentPoints(activeModel);
+            dom.clothingTools.classList.remove('hidden');
+            dom.instructions.style.display = 'none';
+            dom.togglePanelBtn.classList.remove('hidden');
+            dom.sidePanel.classList.add('open');
+            setTimeout(() => {
+                log('Framing camera on model...');
+                const box = new THREE.Box3().setFromObject(activeModel);
+                const size = box.getSize(new THREE.Vector3()).length();
+                const center = box.getCenter(new THREE.Vector3());
+                activeModel.position.sub(center);
+                controls.target.set(0, center.y, 0);
+                camera.position.copy(center).add(new THREE.Vector3(size * 0.7, size * 0.4, size * 0.9));
+                camera.near = size / 100;
+                camera.far = size * 100;
+                camera.updateProjectionMatrix();
+                const pointSize = size / 50;
+                attachmentPoints.forEach(p => p.mesh.scale.setScalar(pointSize));
+                log(`Camera framed. Model loading complete.`);
+                hideLoader();
+            }, 0);
+        }
+
+        function scanForAttachmentPoints(model) {
+            log('Scanning for attachment points...');
+            let bonesFound = 0;
+            const keywords = {
+                'head': /head|neck/i, 'left hand': /left.*hand/i, 'right hand': /right.*hand/i,
+                'left foot': /left.*(foot|ankle)/i, 'right foot': /right.*(foot|ankle)/i,
+            };
+            model.traverse(child => {
+                if (child.isBone) {
+                    bonesFound++;
+                    for (const [key, regex] of Object.entries(keywords)) {
+                        if (regex.test(child.name)) {
+                            log(`- Found attachment bone: ${child.name} (as ${key})`);
+                            const pointMesh = new THREE.Mesh(
+                                new THREE.SphereGeometry(1, 16, 16),
+                                new THREE.MeshBasicMaterial({ color: 0x00aaff, transparent: true, opacity: 0.6 })
+                            );
+                            pointMesh.name = `attachmentPoint_${key}`;
+                            pointMesh.visible = false;
+                            attachmentPoints.push({ name: key, bone: child, mesh: pointMesh });
+                            scene.add(pointMesh);
+                            delete keywords[key]; break;
+                        }
+                    }
+                }
+            });
+            log(`Scan complete. Found ${bonesFound} total bones and ${attachmentPoints.length} attachment points.`);
+            if (attachmentPoints.length === 0) log('WARNING: No standard attachment points found.');
+        }
+
+        async function handleClothingSelection(asset) {
+            // ==================================================================
+            // === IMPORTANT: PASTE YOUR SKETCHFAB API TOKEN ON THE LINE BELOW ===
+            // ==================================================================
+            const SKETCHFAB_API_TOKEN = '7caa1190fdc545fe99b36ad71f036a51'; 
+            
+            if (!activeModel) { alert('Please load a character first.'); return; }
+            if (SKETCHFAB_API_TOKEN === '7caa1190fdc545fe99b36ad71f036a51' || !SKETCHFAB_API_TOKEN) {
+                log('ERROR: API token is missing.');
+                alert('Sketchfab API Token is missing. Please edit the index.html file to add it.');
+                return;
+            }
+
+            log(`Selected asset: ${asset.name}`);
+            dom.assetLibraryModal.classList.add('hidden');
+            showLoader(`Loading ${asset.name}...`);
+            
+            try {
+                const modelInfoUrl = `https://api.sketchfab.com/v3/models/${asset.uid}`;
+                const modelInfoResponse = await fetch(modelInfoUrl, {
+                    headers: { 'Authorization': `Token ${SKETCHFAB_API_TOKEN}` }
+                });
+
+                if (!modelInfoResponse.ok) throw new Error(`Could not get model info. Status: ${modelInfoResponse.status}`);
+                const modelInfo = await modelInfoResponse.json();
+                
+                const downloadUrl = modelInfo.archives?.gltf?.url;
+                if(!downloadUrl) throw new Error('This model is not available for download in GLB format.');
+                log(`Got authenticated download URL for ${asset.name}`);
+
+                const dracoLoader = new DRACOLoader();
+                dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/');
+                const loader = new GLTFLoader();
+                loader.setDRACOLoader(dracoLoader);
+            
+                const gltf = await loader.loadAsync(downloadUrl);
+                log(`Asset loaded successfully from Sketchfab.`);
+                pendingClothingItem = gltf.scene;
+                pendingClothingItem.name = asset.name;
+                enterAttachmentMode();
+            } catch (error) {
+                log(`CRITICAL ERROR: Failed to load online asset: ${error}`);
+                alert(`Could not load ${asset.name}. ${error.message}`);
+                pendingClothingItem = null;
+            } finally {
+                hideLoader();
+            }
+        }
+        
+        function enterAttachmentMode() {
+            log('Entering attachment mode...');
+            dom.attachModal.classList.remove('hidden');
+            attachmentPoints.forEach(p => {
+                p.mesh.visible = true;
+                p.mesh.userData.point = p;
+                p.mesh.layers.set(1);
+            });
+            renderer.domElement.addEventListener('click', onSelectAttachmentPoint);
+        }
+
+        function cancelAttachment() {
+            log('Attachment cancelled.');
+            if(pendingClothingItem) disposeObject(pendingClothingItem);
+            pendingClothingItem = null;
+            dom.attachModal.classList.add('hidden');
+            attachmentPoints.forEach(p => p.mesh.visible = false);
+            renderer.domElement.removeEventListener('click', onSelectAttachmentPoint);
+        }
+
+        function onSelectAttachmentPoint(event) {
+            const mouse = new THREE.Vector2(
+                (event.clientX / window.innerWidth) * 2 - 1,
+                -(event.clientY / window.innerHeight) * 2 + 1
+            );
+            const raycaster = new THREE.Raycaster();
+            raycaster.layers.set(1);
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(attachmentPoints.map(p => p.mesh));
+            if (intersects.length > 0) {
+                const point = intersects[0].object.userData.point;
+                log(`Attachment point selected: ${point.name}`);
+                attachClothingToBone(point.bone);
+            }
+        }
+
+        function attachClothingToBone(targetBone) {
+            if (!pendingClothingItem) return;
+            log(`Attaching item to bone: ${targetBone.name}`);
+            pendingClothingItem.position.set(0, 0, 0);
+            pendingClothingItem.rotation.set(0, 0, 0);
+            pendingClothingItem.scale.set(1, 1, 1);
+            targetBone.add(pendingClothingItem);
+            clothingItems.push(pendingClothingItem);
+            createDomItem(pendingClothingItem);
+            setSelectedClothing(pendingClothingItem);
+            pendingClothingItem = null;
+            cancelAttachment();
+            dom.sidePanel.classList.add('open');
+        }
+        
+        function createDomItem(item) {
+            const button = document.createElement('button');
+            button.className = 'part-item';
+            button.textContent = item.name;
+            button.onclick = () => setSelectedClothing(item);
+            dom.clothingList.appendChild(button);
+            item.userData.domItem = button;
+        }
+
+        function setSelectedClothing(item) {
+            if (selectedClothingItem) selectedClothingItem.userData.domItem.classList.remove('active');
+            selectedClothingItem = item;
+            if (item) {
+                item.userData.domItem.classList.add('active');
+                dom.clothingItemName.textContent = item.name;
+                dom.adjustmentPanel.classList.remove('hidden');
+                syncSlidersToItem();
+            } else {
+                dom.adjustmentPanel.classList.add('hidden');
+            }
+        }
+
+        function syncSlidersToItem() {
+            if (!selectedClothingItem) return;
+            const { position: pos, rotation: rot, scale } = selectedClothingItem;
+            document.getElementById('posX').value = pos.x;
+            document.getElementById('posY').value = pos.y;
+            document.getElementById('posZ').value = pos.z;
+            document.getElementById('rotX').value = THREE.MathUtils.radToDeg(rot.x);
+            document.getElementById('rotY').value = THREE.MathUtils.radToDeg(rot.y);
+            document.getElementById('rotZ').value = THREE.MathUtils.radToDeg(rot.z);
+            document.getElementById('scale').value = scale.x;
+            updateAllSliderValues();
+        }
+        
+        function removeSelectedClothing() {
+            if (!selectedClothingItem) return;
+            log(`Removing item: ${selectedClothingItem.name}`);
+            const index = clothingItems.indexOf(selectedClothingItem);
+            if (index > -1) clothingItems.splice(index, 1);
+            selectedClothingItem.userData.domItem.remove();
+            disposeObject(selectedClothingItem);
+            setSelectedClothing(null);
+        }
+
+        function clearClothing() {
+            log('Clearing all clothing items.');
+            clothingItems.forEach(disposeObject);
+            clothingItems.length = 0;
+            dom.clothingList.innerHTML = '';
+            setSelectedClothing(null);
+        }
+        
+        function setupAdjustmentSliders() {
+            ['posX', 'posY', 'posZ', 'rotX', 'rotY', 'rotZ', 'scale'].forEach(id => {
+                document.getElementById(id).addEventListener('input', applySliderChanges);
+            });
+        }
+
+        function applySliderChanges() {
+            if (!selectedClothingItem) return;
+            const { position, rotation, scale } = selectedClothingItem;
+            position.set(
+                parseFloat(document.getElementById('posX').value),
+                parseFloat(document.getElementById('posY').value),
+                parseFloat(document.getElementById('posZ').value)
+            );
+            rotation.set(
+                THREE.MathUtils.degToRad(document.getElementById('rotX').value),
+                THREE.MathUtils.degToRad(document.getElementById('rotY').value),
+                THREE.MathUtils.degToRad(document.getElementById('rotZ').value)
+            );
+            scale.setScalar(parseFloat(document.getElementById('scale').value));
+            updateAllSliderValues();
+        }
+        
+        function updateAllSliderValues() {
+            if (!selectedClothingItem) return;
+            const { position: pos, rotation: rot, scale } = selectedClothingItem;
+            document.getElementById('posX-val').textContent = pos.x.toFixed(3);
+            document.getElementById('posY-val').textContent = pos.y.toFixed(3);
+            document.getElementById('posZ-val').textContent = pos.z.toFixed(3);
+            document.getElementById('rotX-val').textContent = THREE.MathUtils.radToDeg(rot.x).toFixed(1);
+            document.getElementById('rotY-val').textContent = THREE.MathUtils.radToDeg(rot.y).toFixed(1);
+            document.getElementById('rotZ-val').textContent = THREE.MathUtils.radToDeg(rot.z).toFixed(1);
+            document.getElementById('scale-val').textContent = scale.x.toFixed(2);
+        }
+
+        function exportGLB() {
+            if (!activeModel) { alert("No model loaded to export."); return; }
+            log('Starting GLB export...');
+            showLoader('Exporting GLB...');
+            const exporter = new GLTFExporter();
+            exporter.parse(activeModel, (result) => {
+                const blob = new Blob([result], { type: 'model/gltf-binary' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'character_outfit.glb';
+                a.click();
+                URL.revokeObjectURL(a.href);
+                log('Export successful.');
+                hideLoader();
+            }, (err) => { 
+                hideLoader(); 
+                log(`CRITICAL ERROR: Export failed: ${err}`);
+                alert("Export failed.");
+            }, { binary: true });
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            attachmentPoints.forEach(p => p.bone.getWorldPosition(p.mesh.position));
+            renderer.render(scene, camera);
+        }
+        
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        const showLoader = (text) => { dom.loaderText.textContent = text; dom.loader.classList.remove('hidden'); };
+        const hideLoader = () => dom.loader.classList.add('hidden');
+
+        init();
     </script>
 </body>
 </html>
+
+
