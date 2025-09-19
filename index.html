@@ -1,236 +1,188 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>GLB Studio Debug</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#000">
-  <link rel="manifest" href='data:application/manifest+json,{"name":"GLB Studio","short_name":"GLB","start_url":".","display":"standalone"}'>
-  <style>
-    body { margin:0; background:#111; overflow:hidden; font-family:-apple-system, BlinkMacSystemFont, sans-serif; }
-    canvas { display:block; width:100%; height:100vh; }
-
-    /* Floating glass UI */
-    #ui {
-      position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
-      display:flex; gap:12px;
-      background:rgba(255,255,255,0.12);
-      padding:12px 18px;
-      border-radius:20px;
-      backdrop-filter:blur(20px) saturate(180%);
-      -webkit-backdrop-filter:blur(20px) saturate(180%);
-      box-shadow:0 4px 20px rgba(0,0,0,0.25);
-      z-index:5;
-    }
-    button {
-      padding:12px 18px;
-      font-size:15px;
-      border:none;
-      border-radius:14px;
-      background:rgba(255,255,255,0.3);
-      color:#fff;
-      font-weight:500;
-      backdrop-filter:blur(10px);
-      -webkit-backdrop-filter:blur(10px);
-      box-shadow:inset 0 1px 2px rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.2);
-      transition:background 0.2s;
-    }
-    button:active { background:rgba(255,255,255,0.5); }
-    input { display:none; }
-
-    /* Loading overlay */
-    #loading {
-      position:fixed; inset:0;
-      background:#111;
-      display:flex; flex-direction:column;
-      align-items:center; justify-content:center;
-      color:#fff; font-size:18px;
-      z-index:10;
-    }
-    #progressBar {
-      width:60%; height:8px; margin-top:20px;
-      background:#333; border-radius:4px; overflow:hidden;
-    }
-    #progressFill {
-      width:0%; height:100%; background:#4af; transition:width 0.2s;
-    }
-
-    /* Debug overlay */
-    #debug {
-      position:fixed; bottom:100px; left:10px;
-      width:90%; max-height:40vh;
-      overflow:auto; font-size:12px;
-      background:rgba(0,0,0,0.85); color:#0f0;
-      padding:8px; border-radius:8px;
-      font-family:monospace;
-      white-space:pre-wrap;
-      z-index:20;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>GLB Texture Tool</title>
+    <link rel="manifest" href="data:application/manifest+json,{
+        &quot;name&quot;: &quot;GLB Texture Tool&quot;,
+        &quot;short_name&quot;: &quot;GLBTool&quot;,
+        &quot;start_url&quot;: &quot;.&quot;,
+        &quot;display&quot;: &quot;standalone&quot;,
+        &quot;background_color&quot;: &quot;#1e1e1e&quot;,
+        &quot;theme_color&quot;: &quot;#3a3a3a&quot;,
+        &quot;description&quot;: &quot;A simple tool to load a GLB, apply textures, and export.&quot;,
+        &quot;icons&quot;: [{
+            &quot;src&quot;: &quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAAaklEQVR4nO3BMQEAAADCoPVPbQ0PoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACeDc1wAAGaT44gAAAAAElFTkSuQmCC&quot;,
+            &quot;sizes&quot;: &quot;192x192&quot;,
+            &quot;type&quot;: &quot;image/png&quot;
+        }]
+    }">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="GLBTool">
+    <style>
+        body { margin: 0; background-color: #1e1e1e; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; touch-action: none; }
+        canvas { display: block; }
+        .ui { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.5); padding: 10px; box-sizing: border-box; display: flex; justify-content: space-around; align-items: center; gap: 10px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+        .btn { padding: 12px 15px; border-radius: 8px; border: none; background: #3a3a3a; color: white; font-size: 14px; font-weight: bold; cursor: pointer; flex-grow: 1; }
+        .btn:active { background: #555; }
+        input[type="file"] { display: none; }
+    </style>
 </head>
 <body>
-  <div id="loading">
-    <div>Loading… <span id="progressText">0%</span></div>
-    <div id="progressBar"><div id="progressFill"></div></div>
-  </div>
+    <div class="ui">
+        <button class="btn" onclick="document.getElementById('modelInput').click()">Load Model</button>
+        <button class="btn" onclick="document.getElementById('textureInput').click()">Load Texture</button>
+        <button class="btn" id="exportBtn">Export GLB</button>
+        <input type="file" id="modelInput" accept=".glb,.gltf">
+        <input type="file" id="textureInput" accept="image/*">
+    </div>
 
-  <input type="file" id="modelInput" accept=".glb,.gltf">
-  <input type="file" id="textureInput" accept="image/*">
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.157.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.157.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 
-  <div id="ui">
-    <button onclick="modelInput.click()">📂 Model</button>
-    <button onclick="textureInput.click()">🖼️ Texture</button>
-    <button onclick="exportGLB()">⬇️ Export</button>
-  </div>
+        // --- Basic Scene Setup ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x1e1e1e);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
 
-  <div id="debug">[Debugger ready]</div>
-  <canvas id="c"></canvas>
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.body.appendChild(renderer.domElement);
 
-  <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/examples/js/controls/OrbitControls.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/examples/js/loaders/GLTFLoader.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/examples/js/exporters/GLTFExporter.js"></script>
+        // --- Lighting ---
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(5, 10, 7.5);
+        scene.add(directionalLight);
 
-  <script>
-    // --- Debug overlay ---
-    const debugEl = document.getElementById("debug");
-    function logDebug(msg){ 
-      debugEl.textContent += "\\n" + msg;
-      debugEl.scrollTop = debugEl.scrollHeight;
-    }
-    // Redirect console methods
-    ["log","warn","error"].forEach(fn=>{
-      const orig = console[fn];
-      console[fn] = (...args)=>{
-        orig.apply(console,args);
-        logDebug(fn.toUpperCase()+": "+args.join(" "));
-      }
-    });
-    window.onerror = (m,s,l,c,e)=>{ logDebug("ERROR: "+m+" @"+s+":"+l); };
+        // --- Controls ---
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
 
-    // Loading UI
-    const loadingEl = document.getElementById("loading");
-    const progressText = document.getElementById("progressText");
-    const progressFill = document.getElementById("progressFill");
-    function setProgress(ratio){
-      progressText.textContent = Math.round(ratio*100)+"%";
-      progressFill.style.width = (ratio*100)+"%";
-    }
-    function updateProgress(xhr){
-      if (xhr && xhr.lengthComputable) {
-        setProgress(xhr.loaded / xhr.total);
-      } else {
-        let w = parseInt(progressFill.style.width) || 0;
-        w = (w + 10) % 100;
-        progressFill.style.width = w + "%";
-        progressText.textContent = "Loading…";
-      }
-    }
+        let currentModel = null;
 
-    // Three.js setup
-    let scene = new THREE.Scene();
-    let camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 1000);
-    camera.position.set(0, 1.5, 3);
+        // --- Animation Loop ---
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
 
-    let renderer = new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:true});
-    renderer.setSize(innerWidth, innerHeight);
-    renderer.setPixelRatio(devicePixelRatio);
-    renderer.setClearColor(0xffffff, 1);
-
-    let controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.target.set(0,1,0);
-
-    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1);
-    dirLight.position.set(3,5,2);
-    scene.add(dirLight);
-
-    const roomSize = 12;
-    const roomGeo = new THREE.BoxGeometry(roomSize, roomSize, roomSize);
-    const roomMat = new THREE.MeshStandardMaterial({ color:0xffffff, side:THREE.BackSide });
-    scene.add(new THREE.Mesh(roomGeo, roomMat));
-
-    let model = null;
-
-    // Model loading
-    modelInput.addEventListener('change', e=>{
-      const file = e.target.files[0];
-      if(!file) return;
-      const url = URL.createObjectURL(file);
-      const loader = new THREE.GLTFLoader();
-
-      setProgress(0);
-      loadingEl.style.display = "flex";
-
-      loader.load(url, gltf=>{
-        if(model) scene.remove(model);
-        model = gltf.scene;
-        scene.add(model);
-        console.log("Model loaded:", file.name);
-        setProgress(1);
-        setTimeout(()=>loadingEl.style.display="none",500);
-      }, updateProgress, err=>{
-        console.error("Model load failed:", err);
-        loadingEl.style.display="none";
-      });
-    });
-
-    // Texture loading
-    textureInput.addEventListener('change', e=>{
-      const file = e.target.files[0];
-      if(!file || !model) return;
-      const url = URL.createObjectURL(file);
-      setProgress(0);
-      loadingEl.style.display="flex";
-
-      new THREE.TextureLoader().load(url, tex=>{
-        tex.flipY = false;
-        model.traverse(o=>{
-          if(o.isMesh){
-            o.material.map = tex;
-            o.material.needsUpdate = true;
-          }
+        // --- Window Resize ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
         });
-        console.log("Texture applied:", file.name);
-        setProgress(1);
-        setTimeout(()=>loadingEl.style.display="none",500);
-      }, updateProgress, err=>{
-        console.error("Texture load failed:", err);
-        loadingEl.style.display="none";
-      });
-    });
 
-    function exportGLB(){
-      if(!model) return alert("No model loaded!");
-      const exporter = new THREE.GLTFExporter();
-      exporter.parse(model, glb=>{
-        const blob = new Blob([glb], {type:'model/gltf-binary'});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'export.glb';
-        a.click();
-        console.log("Model exported as export.glb");
-      }, {binary:true});
-    }
+        // --- File Loaders ---
+        const gltfLoader = new GLTFLoader();
+        const textureLoader = new THREE.TextureLoader();
 
-    function animate(){
-      requestAnimationFrame(animate);
-      controls.update();
-      renderer.render(scene, camera);
-    }
-    animate();
+        // 1. Load GLB Model
+        document.getElementById('modelInput').addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
 
-    addEventListener('resize',()=>{
-      camera.aspect = innerWidth/innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(innerWidth,innerHeight);
-    });
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                gltfLoader.parse(e.target.result, '', (gltf) => {
+                    // Clear previous model
+                    if (currentModel) {
+                        scene.remove(currentModel);
+                    }
+                    currentModel = gltf.scene;
+                    scene.add(currentModel);
+                });
+            };
+            reader.readAsArrayBuffer(file);
+        });
 
-    // Hide initial loader after boot
-    setTimeout(()=>loadingEl.style.display="none",1000);
-  </script>
+        // 2. Load Texture Image
+        document.getElementById('textureInput').addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file || !currentModel) {
+                alert("Please load a model first!");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                textureLoader.load(e.target.result, (texture) => {
+                    texture.flipY = false; // Important for GLTF
+                    texture.colorSpace = THREE.SRGBColorSpace;
+                    
+                    // Apply texture to the first found mesh
+                    currentModel.traverse((child) => {
+                        if (child.isMesh) {
+                            child.material.map = texture;
+                            child.material.needsUpdate = true;
+                        }
+                    });
+                });
+            };
+            reader.readAsDataURL(file);
+        });
+        
+        // 3. Export as GLB
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            if (!currentModel) {
+                alert("No model to export!");
+                return;
+            }
+            const exporter = new GLTFExporter();
+            exporter.parse(
+                currentModel,
+                (result) => {
+                    const blob = new Blob([result], { type: 'application/octet-stream' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = 'textured_model.glb';
+                    link.click();
+                },
+                (error) => {
+                    console.error('An error happened during parsing', error);
+                },
+                { binary: true } // Crucial for .glb export
+            );
+        });
+
+        // --- PWA Service Worker ---
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register(
+                'data:application/javascript,' +
+                'const CACHE_NAME = "glb-tool-cache-v1";' +
+                'const urlsToCache = ["' + location.href + '"];' +
+                'self.addEventListener("install", event => {' +
+                '  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)));' +
+                '});' +
+                'self.addEventListener("fetch", event => {' +
+                '  event.respondWith(caches.match(event.request).then(response => response || fetch(event.request)));' +
+                '});',
+                {scope: './'}
+            ).then(function(registration) {
+                console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            }).catch(function(err) {
+                console.log('ServiceWorker registration failed: ', err);
+            });
+        }
+    </script>
 </body>
 </html>
