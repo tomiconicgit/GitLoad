@@ -116,6 +116,16 @@
     const percentText = document.getElementById('percent');
     const progressBar = document.getElementById('progressBar');
 
+    function arrayBufferToBase64(buffer) {
+      let binary = '';
+      const bytes = new Uint8Array(buffer);
+      const len = bytes.byteLength;
+      for (let i = 0; i < len; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      return btoa(binary);
+    }
+
     document.getElementById('authBtn').addEventListener('click', async () => {
       token = document.getElementById('token').value.trim();
       if (!token) return alert('Please enter a token.');
@@ -184,7 +194,7 @@
         progressBar.style.width = '100%';
         percentText.textContent = '100%';
 
-        const base64Content = btoa(reader.result);
+        const base64Content = arrayBufferToBase64(reader.result);
         const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${path}`;
         const payload = {
           message: `Upload ${file.name}`,
@@ -230,7 +240,7 @@
         }
       };
 
-      reader.readAsBinaryString(file);
+      reader.readAsArrayBuffer(file);
     });
   </script>
 </body>
