@@ -1,770 +1,236 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta
-    name="viewport"
-    content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no,maximum-scale=1.0"
-  />
-  <title>Procedural Model Lab — FBX Extractor PWA</title>
-
-  <!-- PWA -->
-  <meta name="theme-color" content="#0b0f14" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href='data:application/manifest+json;charset=utf-8,{
-    "name":"Procedural Model Lab",
-    "short_name":"Model Lab",
-    "start_url":".",
-    "display":"standalone",
-    "background_color":"#0b0f14",
-    "theme_color":"#0b0f14",
-    "icons":[
-      {"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 512 512%27%3E%3Crect width=%27512%27 height=%27512%27 rx=%2796%27 fill=%230b0f14/%3E%3Cpath d=%27M144 360h96v-48h-64v-32h64v-48h-64v-32h64v-48h-96v208Zm128-208h96l-64 104 64 104h-96l-64-104 64-104Z%27 fill=%23a6e1ff/%3E%3C/svg%3E","sizes":"512x512","type":"image/svg+xml"}
-    ]
-  }' />
-
+  <meta charset="UTF-8">
+  <title>GLB Studio Debug</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#000">
+  <link rel="manifest" href='data:application/manifest+json,{"name":"GLB Studio","short_name":"GLB","start_url":".","display":"standalone"}'>
   <style>
-    :root{
-      --bg:#0b0f14;
-      --panel:#0f1a23;
-      --accent:#39c2ff;
-      --text:#e6f2ff;
-      --muted:#9fb6c6;
-      --ok:#19c37d;
-      --warn:#ffb020;
-      --err:#ff5d5d;
-      --border:#123246;
+    body { margin:0; background:#111; overflow:hidden; font-family:-apple-system, BlinkMacSystemFont, sans-serif; }
+    canvas { display:block; width:100%; height:100vh; }
+
+    /* Floating glass UI */
+    #ui {
+      position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+      display:flex; gap:12px;
+      background:rgba(255,255,255,0.12);
+      padding:12px 18px;
+      border-radius:20px;
+      backdrop-filter:blur(20px) saturate(180%);
+      -webkit-backdrop-filter:blur(20px) saturate(180%);
+      box-shadow:0 4px 20px rgba(0,0,0,0.25);
+      z-index:5;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial}
-    #app{position:fixed;inset:0;display:grid;grid-template-rows:56% 44%}
-    #viewer{position:relative;overflow:hidden;background:linear-gradient(180deg,#0c141b,#0a1117)}
-    #canvas{position:absolute;inset:0}
-    #hud{position:absolute;left:12px;top:10px;display:flex;gap:8px;z-index:5}
-    .pill{background:rgba(15,26,35,.7);border:1px solid var(--border);backdrop-filter:blur(6px);padding:6px 10px;border-radius:999px;font-size:12px;color:var(--muted)}
-    .btn{appearance:none;border:1px solid var(--border);background:var(--panel);color:var(--text);padding:10px 12px;border-radius:10px;font-weight:600}
-    .btn:active{transform:translateY(1px)}
-    .btn.primary{background:linear-gradient(180deg,#1a2b38,#13212c);border-color:#23465c}
-    .btn.ok{border-color:#15694c;background:#0f2a23}
-    .btn.warn{border-color:#6b4a13;background:#251a08}
-    .btn.err{border-color:#6b1313;background:#2a0f0f}
-    #ui{border-top:1px solid var(--border);background:linear-gradient(180deg,#0f1a23,#0c151c);min-height:0;display:flex;flex-direction:column}
-    #tabs{display:flex;gap:6px;padding:10px;overflow:auto}
-    .tab{flex:0 0 auto}
-    .tab button{border-radius:999px}
-    .tab button.active{outline:2px solid var(--accent)}
-    #panelWrap{flex:1;min-height:0;padding:10px;padding-top:0;overflow:auto}
-    .panel{background:rgba(16,28,38,.6);border:1px solid var(--border);border-radius:12px;padding:12px;margin-top:10px}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .row{display:flex;align-items:center;gap:10px;margin:8px 0}
-    label{font-size:12px;color:var(--muted);flex:1}
-    input[type="range"]{flex:2}
-    input[type="color"]{width:42px;height:28px;border:1px solid var(--border);background:var(--panel);border-radius:6px}
-    #drop{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.4);border:2px dashed #3a8fb5;color:#bfe7ff;font-weight:700;z-index:6}
-    #nav{position:absolute;right:10px;bottom:10px;z-index:4;display:flex;gap:8px}
-    .chip{font-size:12px;padding:6px 10px;border-radius:999px;background:rgba(0,0,0,.35);border:1px solid var(--border)}
-    .small{font-size:12px;color:var(--muted)}
-    .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
-    .kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-    .kpi .panel{padding:10px;text-align:center}
-    .kpi .panel b{display:block;font-size:16px}
-    .hr{height:1px;background:var(--border);margin:10px 0}
-    .hidden{display:none!important}
-    .marker{position:absolute;pointer-events:none;z-index:5;border:2px solid var(--accent);border-radius:50%;width:16px;height:16px;transform:translate(-50%,-50%)}
+    button {
+      padding:12px 18px;
+      font-size:15px;
+      border:none;
+      border-radius:14px;
+      background:rgba(255,255,255,0.3);
+      color:#fff;
+      font-weight:500;
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
+      box-shadow:inset 0 1px 2px rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.2);
+      transition:background 0.2s;
+    }
+    button:active { background:rgba(255,255,255,0.5); }
+    input { display:none; }
+
+    /* Loading overlay */
+    #loading {
+      position:fixed; inset:0;
+      background:#111;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      color:#fff; font-size:18px;
+      z-index:10;
+    }
+    #progressBar {
+      width:60%; height:8px; margin-top:20px;
+      background:#333; border-radius:4px; overflow:hidden;
+    }
+    #progressFill {
+      width:0%; height:100%; background:#4af; transition:width 0.2s;
+    }
+
+    /* Debug overlay */
+    #debug {
+      position:fixed; bottom:100px; left:10px;
+      width:90%; max-height:40vh;
+      overflow:auto; font-size:12px;
+      background:rgba(0,0,0,0.85); color:#0f0;
+      padding:8px; border-radius:8px;
+      font-family:monospace;
+      white-space:pre-wrap;
+      z-index:20;
+    }
   </style>
 </head>
 <body>
-  <div id="app">
-    <section id="viewer">
-      <canvas id="canvas"></canvas>
-      <div id="hud">
-        <div class="pill">Tap to set target • Pinch/drag to orbit</div>
-      </div>
-      <div id="nav">
-        <button id="btnBones" class="btn">Bones</button>
-        <button id="btnWire"  class="btn">Wire</button>
-        <button id="btnReset" class="btn warn">Reset</button>
-      </div>
-      <div id="drop">Drop FBX here</div>
-      <div id="targetMarker" class="marker hidden"></div>
-    </section>
-
-    <section id="ui">
-      <div id="tabs">
-        <div class="tab"><button class="btn primary active" data-tab="load">Load</button></div>
-        <div class="tab"><button class="btn primary" data-tab="inspect">Inspect</button></div>
-        <div class="tab"><button class="btn primary" data-tab="procedural">Procedural</button></div>
-        <div class="tab"><button class="btn primary" data-tab="export">Export</button></div>
-      </div>
-
-      <div id="panelWrap">
-        <!-- LOAD -->
-        <div id="panel-load" class="panel">
-          <div class="row">
-            <label>FBX file</label>
-            <input id="fileFBX" type="file" accept=".fbx,model/vnd.fpx" />
-          </div>
-          <div class="small">Tip: you can also drag &amp; drop the file onto the viewer.</div>
-          <div class="hr"></div>
-          <div class="grid">
-            <button id="btnCenter" class="btn">Center &amp; Frame</button>
-            <button id="btnGround" class="btn">Toggle Ground</button>
-          </div>
-          <div class="hr"></div>
-          <div class="kpi">
-            <div class="panel"><span class="small">Meshes</span><b id="kMeshes">—</b></div>
-            <div class="panel"><span class="small">Vertices</span><b id="kVerts">—</b></div>
-            <div class="panel"><span class="small">Bones</span><b id="kBones">—</b></div>
-          </div>
-        </div>
-
-        <!-- INSPECT -->
-        <div id="panel-inspect" class="panel hidden">
-          <div class="row"><label>Summary</label></div>
-          <pre id="summary" class="mono small" style="white-space:pre-wrap;max-height:200px;overflow:auto;background:#08121a;border:1px solid var(--border);border-radius:8px;padding:8px"></pre>
-
-          <div class="hr"></div>
-          <div class="grid">
-            <button id="btnDownloadJSON" class="btn ok">Download Data JSON</button>
-            <button id="btnDownloadThree" class="btn">Download THREE JSON</button>
-          </div>
-        </div>
-
-        <!-- PROCEDURAL -->
-        <div id="panel-procedural" class="panel hidden">
-          <div class="row"><label>Preset</label>
-            <select id="presetSelect"></select>
-            <button id="presetSave" class="btn">Save</button>
-            <button id="presetDelete" class="btn err">Delete</button>
-          </div>
-
-          <div class="grid">
-            <div>
-              <h4>Proportions</h4>
-              <div class="row"><label>Height</label><input type="range" id="pHeight" min="0.8" max="1.25" step="0.01" value="1.00"><span id="vHeight" class="small mono">1.00</span></div>
-              <div class="row"><label>Torso Length</label><input type="range" id="pTorso" min="0.8" max="1.3" step="0.01" value="1.00"><span id="vTorso" class="small mono">1.00</span></div>
-              <div class="row"><label>Neck Length</label><input type="range" id="pNeck" min="0.8" max="1.3" step="0.01" value="1.00"><span id="vNeck" class="small mono">1.00</span></div>
-              <div class="row"><label>Head Size</label><input type="range" id="pHead" min="0.8" max="1.3" step="0.01" value="1.00"><span id="vHead" class="small mono">1.00</span></div>
-              <div class="row"><label>Upper Arm</label><input type="range" id="pUArm" min="0.8" max="1.3" step="0.01" value="1.00"><span id="vUArm" class="small mono">1.00</span></div>
-              <div class="row"><label>Lower Arm</label><input type="range" id="pLArm" min="0.8" max="1.3" step="0.01" value="1.00"><span id="vLArm" class="small mono">1.00</span></div>
-              <div class="row"><label>Upper Leg</label><input type="range" id="pULeg" min="0.8" max="1.3" step="0.01" value="1.00"><span id="vULeg" class="small mono">1.00</span></div>
-              <div class="row"><label>Lower Leg</label><input type="range" id="pLLeg" min="0.8" max="1.3" step="0.01" value="1.00"><span id="vLLeg" class="small mono">1.00</span></div>
-              <div class="row"><label>Hands</label><input type="range" id="pHand" min="0.8" max="1.4" step="0.01" value="1.00"><span id="vHand" class="small mono">1.00</span></div>
-              <div class="row"><label>Feet</label><input type="range" id="pFoot" min="0.8" max="1.4" step="0.01" value="1.00"><span id="vFoot" class="small mono">1.00</span></div>
-            </div>
-            <div>
-              <h4>Material</h4>
-              <div class="row"><label>Base Color</label><input type="color" id="mColor" value="#a6e1ff"></div>
-              <div class="row"><label>Metalness</label><input type="range" id="mMetal" min="0" max="1" step="0.01" value="0.1"><span id="vMetal" class="small mono">0.10</span></div>
-              <div class="row"><label>Roughness</label><input type="range" id="mRough" min="0" max="1" step="0.01" value="0.65"><span id="vRough" class="small mono">0.65</span></div>
-              <div class="row"><label>Normal Intensity</label><input type="range" id="mNorm" min="0" max="2" step="0.01" value="1"><span id="vNorm" class="small mono">1.00</span></div>
-              <div class="row"><label>Emissive</label><input type="range" id="mEmi" min="0" max="2" step="0.01" value="0"><span id="vEmi" class="small mono">0.00</span></div>
-            </div>
-          </div>
-          <div class="small">All adjustments are <b>bone-driven scaling</b> for realism on skinned meshes (works great with Mixamo-style rigs like <i>X Bot</i>).</div>
-        </div>
-
-        <!-- EXPORT -->
-        <div id="panel-export" class="panel hidden">
-          <div class="grid">
-            <button id="btnExportGLB" class="btn ok">Export GLB (bakes current pose)</button>
-            <button id="btnExportData" class="btn">Export Data JSON (raw arrays)</button>
-          </div>
-          <div class="hr"></div>
-          <div class="small">
-            JSON includes: <b>positions, normals, uvs, indices, skinIndices, skinWeights</b> (as base64 typed arrays), <b>skeleton</b> (names, parent index, bone matrices & inverse bind matrices), <b>materials</b>, and <b>animations</b> (THREE JSON).
-          </div>
-        </div>
-      </div>
-    </section>
+  <div id="loading">
+    <div>Loading… <span id="progressText">0%</span></div>
+    <div id="progressBar"><div id="progressFill"></div></div>
   </div>
 
-  <script type="module">
-    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.157/build/three.module.js';
-    import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.157/examples/jsm/controls/OrbitControls.js';
-    import { FBXLoader } from 'https://cdn.jsdelivr.net/npm/three@0.157/examples/jsm/loaders/FBXLoader.js';
-    import { GLTFExporter } from 'https://cdn.jsdelivr.net/npm/three@0.157/examples/jsm/exporters/GLTFExporter.js';
+  <input type="file" id="modelInput" accept=".glb,.gltf">
+  <input type="file" id="textureInput" accept="image/*">
 
-    // ---------- Scene ----------
-    const canvas = document.getElementById('canvas');
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:false });
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-    renderer.setSize(innerWidth, innerHeight*0.56); // top section
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(55, canvas.clientWidth/canvas.clientHeight, 0.01, 5000);
-    camera.position.set(2.8, 1.6, 3.8);
-    const controls = new OrbitControls(camera, canvas);
-    controls.enableDamping = true; controls.target.set(0,1,0);
+  <div id="ui">
+    <button onclick="modelInput.click()">📂 Model</button>
+    <button onclick="textureInput.click()">🖼️ Texture</button>
+    <button onclick="exportGLB()">⬇️ Export</button>
+  </div>
 
-    // Lights
-    const hemi = new THREE.HemisphereLight(0xcfe8ff, 0x0d1014, 0.65);
-    scene.add(hemi);
-    const dir = new THREE.DirectionalLight(0xffffff, 0.85);
-    dir.position.set(5,6,3); dir.castShadow = false;
-    scene.add(dir);
+  <div id="debug">[Debugger ready]</div>
+  <canvas id="c"></canvas>
 
-    // Ground
-    const groundGroup = new THREE.Group();
-    const grid = new THREE.GridHelper(100, 100, 0x244555, 0x152737);
-    grid.material.opacity = 0.35; grid.material.transparent = true;
-    groundGroup.add(grid);
-    const groundRay = new THREE.Mesh(new THREE.PlaneGeometry(1000,1000), new THREE.MeshBasicMaterial({visible:false}));
-    groundRay.rotateX(-Math.PI/2);
-    groundGroup.add(groundRay);
-    scene.add(groundGroup);
+  <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/examples/js/exporters/GLTFExporter.js"></script>
 
-    // State
-    let currentRoot = new THREE.Group(); scene.add(currentRoot);
-    let mixer = null, actions = {};
-    let skeletonHelper = null;
-    let wireOverlays = [];
-    let clock = new THREE.Clock();
-    let totalVerts=0,totalMeshes=0,totalBones=0;
+  <script>
+    // --- Debug overlay ---
+    const debugEl = document.getElementById("debug");
+    function logDebug(msg){ 
+      debugEl.textContent += "\\n" + msg;
+      debugEl.scrollTop = debugEl.scrollHeight;
+    }
+    // Redirect console methods
+    ["log","warn","error"].forEach(fn=>{
+      const orig = console[fn];
+      console[fn] = (...args)=>{
+        orig.apply(console,args);
+        logDebug(fn.toUpperCase()+": "+args.join(" "));
+      }
+    });
+    window.onerror = (m,s,l,c,e)=>{ logDebug("ERROR: "+m+" @"+s+":"+l); };
 
-    // ---------- Loaders ----------
-    const fbxLoader = new FBXLoader();
+    // Loading UI
+    const loadingEl = document.getElementById("loading");
+    const progressText = document.getElementById("progressText");
+    const progressFill = document.getElementById("progressFill");
+    function setProgress(ratio){
+      progressText.textContent = Math.round(ratio*100)+"%";
+      progressFill.style.width = (ratio*100)+"%";
+    }
+    function updateProgress(xhr){
+      if (xhr && xhr.lengthComputable) {
+        setProgress(xhr.loaded / xhr.total);
+      } else {
+        let w = parseInt(progressFill.style.width) || 0;
+        w = (w + 10) % 100;
+        progressFill.style.width = w + "%";
+        progressText.textContent = "Loading…";
+      }
+    }
 
-    async function loadFBXFromFile(file){
-      const arrayBuffer = await file.arrayBuffer();
-      const blobURL = URL.createObjectURL(new Blob([arrayBuffer]));
-      return new Promise((res,rej)=>{
-        fbxLoader.load(blobURL, obj=>{ URL.revokeObjectURL(blobURL); res(obj); }, undefined, rej);
+    // Three.js setup
+    let scene = new THREE.Scene();
+    let camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 1000);
+    camera.position.set(0, 1.5, 3);
+
+    let renderer = new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:true});
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(devicePixelRatio);
+    renderer.setClearColor(0xffffff, 1);
+
+    let controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.target.set(0,1,0);
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+    dirLight.position.set(3,5,2);
+    scene.add(dirLight);
+
+    const roomSize = 12;
+    const roomGeo = new THREE.BoxGeometry(roomSize, roomSize, roomSize);
+    const roomMat = new THREE.MeshStandardMaterial({ color:0xffffff, side:THREE.BackSide });
+    scene.add(new THREE.Mesh(roomGeo, roomMat));
+
+    let model = null;
+
+    // Model loading
+    modelInput.addEventListener('change', e=>{
+      const file = e.target.files[0];
+      if(!file) return;
+      const url = URL.createObjectURL(file);
+      const loader = new THREE.GLTFLoader();
+
+      setProgress(0);
+      loadingEl.style.display = "flex";
+
+      loader.load(url, gltf=>{
+        if(model) scene.remove(model);
+        model = gltf.scene;
+        scene.add(model);
+        console.log("Model loaded:", file.name);
+        setProgress(1);
+        setTimeout(()=>loadingEl.style.display="none",500);
+      }, updateProgress, err=>{
+        console.error("Model load failed:", err);
+        loadingEl.style.display="none";
       });
-    }
+    });
 
-    function clearModel(){
-      if (mixer) mixer.stopAllAction(), mixer.uncacheRoot(currentRoot), mixer=null, actions={};
-      currentRoot.removeFromParent(); currentRoot.traverse(o=>o.geometry && o.geometry.dispose());
-      currentRoot = new THREE.Group(); scene.add(currentRoot);
-      if (skeletonHelper){ skeletonHelper.removeFromParent(); skeletonHelper = null; }
-      wireOverlays.forEach(w=>w.removeFromParent()); wireOverlays = [];
-      totalVerts=0; totalMeshes=0; totalBones=0;
-      updateKPIs();
-    }
+    // Texture loading
+    textureInput.addEventListener('change', e=>{
+      const file = e.target.files[0];
+      if(!file || !model) return;
+      const url = URL.createObjectURL(file);
+      setProgress(0);
+      loadingEl.style.display="flex";
 
-    function addModelToScene(obj){
-      clearModel();
-      normalizeMaterials(obj);
-      currentRoot.add(obj);
-      // Animations
-      if (obj.animations && obj.animations.length){
-        mixer = new THREE.AnimationMixer(obj);
-        obj.animations.forEach((clip,i)=>{
-          const act = mixer.clipAction(clip);
-          actions[clip.name || `clip_${i}`] = act;
+      new THREE.TextureLoader().load(url, tex=>{
+        tex.flipY = false;
+        model.traverse(o=>{
+          if(o.isMesh){
+            o.material.map = tex;
+            o.material.needsUpdate = true;
+          }
         });
-        // Autoplay first clip if any
-        const first = Object.values(actions)[0];
-        if (first){ first.play(); }
-      }
-      // Wire overlays
-      obj.traverse(o=>{
-        if (o.isMesh || o.isSkinnedMesh){
-          totalMeshes++;
-          if (o.geometry && o.geometry.attributes.position) totalVerts += o.geometry.attributes.position.count;
-          // skeleton count
-          if (o.isSkinnedMesh && o.skeleton) totalBones = Math.max(totalBones, o.skeleton.bones.length);
-          const w = new THREE.LineSegments(new THREE.WireframeGeometry(o.geometry), new THREE.LineBasicMaterial({color:0x3a8fb5, transparent:true, opacity:0.25}));
-          w.visible = false; wireOverlays.push(w); o.add(w);
-        }
-      });
-      updateKPIs();
-      centerAndFrame(obj);
-      buildSummary(obj);
-    }
-
-    function normalizeMaterials(obj){
-      obj.traverse(o=>{
-        if (o.isMesh || o.isSkinnedMesh){
-          o.castShadow = o.receiveShadow = false;
-          const mat = o.material;
-          if (Array.isArray(mat)) return;
-          if (!(mat instanceof THREE.MeshStandardMaterial)){
-            o.material = new THREE.MeshStandardMaterial({ color: (mat?.color?.getHex?.() ?? 0xa6e1ff), metalness:0.1, roughness:0.65, skinning:!!o.isSkinnedMesh });
-          }else{
-            o.material.skinning = !!o.isSkinnedMesh;
-          }
-        }
-      });
-    }
-
-    function centerAndFrame(obj){
-      const box = new THREE.Box3().setFromObject(obj);
-      const size = new THREE.Vector3(); box.getSize(size);
-      const center = new THREE.Vector3(); box.getCenter(center);
-      obj.position.sub(center.multiplyScalar(1)); // center to origin
-      controls.target.set(0, Math.max(0.9, size.y*0.4), 0);
-      const dist = Math.max(size.length()*0.55, 2.5);
-      const dirVec = new THREE.Vector3(1,0.5,1).normalize();
-      camera.position.copy(dirVec.multiplyScalar(dist));
-      camera.near = Math.max(0.01, size.length()*0.002); camera.far = Math.max(1000, size.length()*5); camera.updateProjectionMatrix();
-    }
-
-    function updateKPIs(){
-      qs('#kMeshes').textContent = totalMeshes || '—';
-      qs('#kVerts').textContent  = totalVerts  || '—';
-      qs('#kBones').textContent  = totalBones  || '—';
-    }
-
-    // ---------- Extraction ----------
-    function typedArrayToBase64(ta){
-      const buf = ta.buffer.slice(ta.byteOffset, ta.byteOffset + ta.byteLength);
-      const bytes = new Uint8Array(buf);
-      let binary = '';
-      const chunk = 0x8000;
-      for(let i=0;i<bytes.length;i+=chunk){
-        const sub = bytes.subarray(i,i+chunk);
-        binary += String.fromCharCode.apply(null, sub);
-      }
-      return btoa(binary);
-    }
-    function attrPack(attr){ if(!attr) return null;
-      const array = attr.array;
-      const type = array.constructor.name; const itemSize = attr.itemSize;
-      return { type, itemSize, count: attr.count, base64: typedArrayToBase64(array) };
-    }
-    function indexPack(geom){
-      const idx = geom.getIndex();
-      if (!idx) return null;
-      const arr = idx.array; return { type: arr.constructor.name, count: idx.count, base64: typedArrayToBase64(arr) };
-    }
-    function matrixToArray(m){ const e = m.elements; return Array.from(e); }
-
-    function extractAll(root){
-      const meshes = [];
-      const skeletons = [];
-      const materials = [];
-      const matMap = new Map();
-
-      root.traverse(o=>{
-        if (o.isMesh || o.isSkinnedMesh){
-          const g = o.geometry;
-          const sk = o.isSkinnedMesh ? o.skeleton : null;
-
-          let matId = null;
-          const mat = o.material;
-          if (mat){
-            if (!matMap.has(mat.uuid)){
-              const mrec = {
-                uuid: mat.uuid,
-                name: mat.name || '',
-                type: mat.type,
-                color: mat.color ? mat.color.getHex() : null,
-                metalness: mat.metalness ?? null,
-                roughness: mat.roughness ?? null,
-                emissive: mat.emissive ? mat.emissive.getHex() : null
-              };
-              matMap.set(mat.uuid, materials.push(mrec)-1);
-            }
-            matId = matMap.get(mat.uuid);
-          }
-
-          let skelIdx = null;
-          if (sk){
-            const bones = sk.bones.map((b, i)=>({
-              index:i,
-              name:b.name,
-              parent: b.parent && sk.bones.includes(b.parent) ? sk.bones.indexOf(b.parent) : -1,
-              matrix: matrixToArray(b.matrix),
-            }));
-            const inverses = sk.boneInverses?.map(m=>matrixToArray(m)) ?? [];
-            skelIdx = skeletons.push({
-              boneCount: sk.bones.length,
-              bones,
-              boneInverses: inverses,
-              rootBone: sk.bones[0]?.name ?? null
-            }) - 1;
-          }
-
-          meshes.push({
-            name: o.name,
-            uuid: o.uuid,
-            isSkinned: !!sk,
-            materialIndex: matId,
-            attributes: {
-              position: attrPack(g.getAttribute('position')),
-              normal:   attrPack(g.getAttribute('normal')),
-              tangent:  attrPack(g.getAttribute('tangent')),
-              uv:       attrPack(g.getAttribute('uv')),
-              color:    attrPack(g.getAttribute('color')),
-              skinIndex:attrPack(g.getAttribute('skinIndex')),
-              skinWeight:attrPack(g.getAttribute('skinWeight')),
-            },
-            index: indexPack(g),
-            skeleton: sk ? { skeletonIndex: skelIdx } : null
-          });
-        }
-      });
-
-      // Animations (use THREE JSON for compactness/compatibility)
-      const animJSON = THREE.AnimationClip.toJSON
-        ? (root.animations||[]).map(clip => THREE.AnimationClip.toJSON(clip))
-        : [];
-
-      return {
-        meta: {
-          generator: "Procedural Model Lab PWA",
-          three: THREE.REVISION,
-          timestamp: new Date().toISOString()
-        },
-        meshes, skeletons, materials, animations: animJSON
-      };
-    }
-
-    function threeJSON(root){
-      const j = root.toJSON ? root.toJSON() : null;
-      return j ?? { error: "toJSON unavailable" };
-    }
-
-    function buildSummary(root){
-      const data = extractAll(root);
-      const lines = [];
-      lines.push(`Meshes: ${data.meshes.length}`);
-      data.meshes.forEach((m,i)=>{
-        const v = m.attributes.position?.count ?? 0;
-        const idx = m.index?.count ?? 0;
-        lines.push(`  [${i}] ${m.name || m.uuid}  verts=${v}  indices=${idx}  skinned=${m.isSkinned}`);
-      });
-      const boneCounts = data.skeletons.map(s=>s.boneCount);
-      lines.push(`Skeletons: ${data.skeletons.length} ${boneCounts.length? ('• bones: '+boneCounts.join(',')) : ''}`);
-      lines.push(`Animations: ${(data.animations||[]).length}`);
-      qs('#summary').textContent = lines.join('\n');
-    }
-
-    // ---------- UI ----------
-    const drop = qs('#drop');
-    const targetMarker = qs('#targetMarker');
-    let moveTarget = null;
-
-    // Tabs
-    qsa('[data-tab]').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        qsa('[data-tab]').forEach(b=>b.classList.remove('active'));
-        btn.classList.add('active');
-        const tab = btn.getAttribute('data-tab');
-        qsa('#panelWrap>.panel').forEach(p=>p.classList.add('hidden'));
-        qs('#panel-'+tab).classList.remove('hidden');
+        console.log("Texture applied:", file.name);
+        setProgress(1);
+        setTimeout(()=>loadingEl.style.display="none",500);
+      }, updateProgress, err=>{
+        console.error("Texture load failed:", err);
+        loadingEl.style.display="none";
       });
     });
-
-    // Load file
-    qs('#fileFBX').addEventListener('change', async e=>{
-      const f = e.target.files?.[0];
-      if(!f) return;
-      try{
-        const obj = await loadFBXFromFile(f);
-        addModelToScene(obj);
-      }catch(err){
-        alert('Failed to load FBX: '+err.message);
-        console.error(err);
-      }
-    });
-
-    // Drag & Drop
-    ['dragenter','dragover'].forEach(ev=>canvas.addEventListener(ev, e=>{ e.preventDefault(); drop.style.display='flex'; }));
-    ['dragleave','drop'].forEach(ev=>canvas.addEventListener(ev, e=>{ e.preventDefault(); drop.style.display='none'; }));
-    canvas.addEventListener('drop', async e=>{
-      const f = e.dataTransfer.files?.[0];
-      if(!f) return;
-      try{ const obj = await loadFBXFromFile(f); addModelToScene(obj); }catch(err){ alert('Failed: '+err.message); }
-    });
-
-    // Buttons
-    qs('#btnCenter').addEventListener('click', ()=> currentRoot.children[0] && centerAndFrame(currentRoot.children[0]));
-    let groundVisible = true;
-    qs('#btnGround').addEventListener('click',()=>{ groundVisible = !groundVisible; groundGroup.visible = groundVisible; });
-    qs('#btnBones').addEventListener('click',()=>{
-      if (skeletonHelper){ skeletonHelper.visible = !skeletonHelper.visible; return; }
-      const skinned = []; currentRoot.traverse(o=>{ if(o.isSkinnedMesh) skinned.push(o); });
-      if (!skinned.length) return;
-      skeletonHelper = new THREE.SkeletonHelper(skinned[0]); skeletonHelper.visible = true; scene.add(skeletonHelper);
-    });
-    qs('#btnWire').addEventListener('click',()=>{ wireOverlays.forEach(w=>w.visible = !w.visible); });
-    qs('#btnReset').addEventListener('click',()=>{ resetPose(); applyPreset(slidersToPreset()); });
-
-    // Inspect downloads
-    qs('#btnDownloadJSON').addEventListener('click',()=>{
-      const data = extractAll(currentRoot);
-      downloadJSON(data, 'fbx-data.json');
-    });
-    qs('#btnDownloadThree').addEventListener('click',()=>{
-      const j = threeJSON(currentRoot);
-      downloadJSON(j, 'three-object.json');
-    });
-
-    // Export page
-    qs('#btnExportGLB').addEventListener('click',()=>exportGLB());
-    qs('#btnExportData').addEventListener('click',()=>{
-      const data = extractAll(currentRoot);
-      downloadJSON(data, 'fbx-data.json');
-    });
-
-    // Tap-to-move on ground
-    const raycaster = new THREE.Raycaster();
-    const pointer = new THREE.Vector2();
-    canvas.addEventListener('pointerdown', e=>{
-      const rect = canvas.getBoundingClientRect();
-      pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-      raycaster.setFromCamera(pointer, camera);
-      const hit = raycaster.intersectObject(groundRay, true)[0];
-      if (hit){
-        moveTarget = hit.point.clone(); showMarkerAt(moveTarget);
-      }
-    });
-    function showMarkerAt(p){
-      // project to screen
-      const sp = p.clone().project(camera);
-      const x = (sp.x*0.5+0.5)*canvas.clientWidth;
-      const y = (-sp.y*0.5+0.5)*canvas.clientHeight;
-      targetMarker.style.left = x+'px';
-      targetMarker.style.top  = y+'px';
-      targetMarker.classList.remove('hidden');
-      setTimeout(()=>targetMarker.classList.add('hidden'), 900);
-    }
-
-    // ---------- Procedural controls (bone scaling) ----------
-    const controlsMap = [
-      ['pHeight','vHeight'],['pTorso','vTorso'],['pNeck','vNeck'],['pHead','vHead'],
-      ['pUArm','vUArm'],['pLArm','vLArm'],['pULeg','vULeg'],['pLLeg','vLLeg'],
-      ['pHand','vHand'],['pFoot','vFoot']
-    ];
-    controlsMap.forEach(([s,v])=>{
-      const slider = qs('#'+s); const val = qs('#'+v);
-      slider.addEventListener('input',()=>{ val.textContent = (+slider.value).toFixed(2); applyPreset(slidersToPreset()); });
-    });
-    // Material sliders
-    ['mMetal','mRough','mNorm','mEmi'].forEach(id=>{
-      const slider = qs('#'+id); const v = qs('#v'+id.substring(1).replace(/^./, c=>c.toUpperCase()));
-      slider.addEventListener('input',()=>{ v.textContent = (+slider.value).toFixed(2); applyMaterial(); });
-    });
-    qs('#mColor').addEventListener('input',applyMaterial);
-
-    function slidersToPreset(){
-      const get = id=>+qs('#'+id).value;
-      return {
-        height:get('pHeight'), torso:get('pTorso'), neck:get('pNeck'), head:get('pHead'),
-        uarm:get('pUArm'), larm:get('pLArm'), uleg:get('pULeg'), lleg:get('pLLeg'),
-        hand:get('pHand'), foot:get('pFoot'),
-        color:qs('#mColor').value, metal:+qs('#mMetal').value, rough:+qs('#mRough').value,
-        norm:+qs('#mNorm').value, emi:+qs('#mEmi').value
-      };
-    }
-
-    function applyMaterial(){
-      const color = new THREE.Color(qs('#mColor').value);
-      const metal = +qs('#mMetal').value;
-      const rough = +qs('#mRough').value;
-      const norm  = +qs('#mNorm').value;
-      const emi   = +qs('#mEmi').value;
-      currentRoot.traverse(o=>{
-        if (o.isMesh || o.isSkinnedMesh){
-          const m = o.material;
-          if (!Array.isArray(m)){
-            m.color && m.color.copy(color);
-            if ('metalness' in m) m.metalness = metal;
-            if ('roughness' in m) m.roughness = rough;
-            if ('emissiveIntensity' in m) m.emissiveIntensity = emi;
-            if (m.normalScale) m.normalScale.setScalar(norm);
-            m.needsUpdate = true;
-          }
-        }
-      });
-    }
-
-    // Bone name heuristics for Mixamo/XBot style rigs
-    const BONE_TAGS = [
-      { key:'torso', names:['Spine','Spine1','Spine2','Hips'] },
-      { key:'neck',  names:['Neck'] },
-      { key:'head',  names:['Head'] },
-      { key:'uarm',  names:['LeftArm','RightArm','UpperArm'] },
-      { key:'larm',  names:['LeftForeArm','RightForeArm','LowerArm'] },
-      { key:'uleg',  names:['LeftUpLeg','RightUpLeg','UpperLeg'] },
-      { key:'lleg',  names:['LeftLeg','RightLeg','LowerLeg'] },
-      { key:'hand',  names:['LeftHand','RightHand'] },
-      { key:'foot',  names:['LeftFoot','RightFoot','LeftToeBase','RightToeBase'] },
-    ];
-
-    const bindScales = new Map(); // bone -> Vector3 (original)
-    function cacheBindScales(){
-      bindScales.clear();
-      currentRoot.traverse(o=>{
-        if (o.isBone){
-          bindScales.set(o, o.scale.clone());
-        }
-      });
-    }
-
-    function resetPose(){
-      currentRoot.traverse(o=>{
-        if (o.isBone){
-          const s = bindScales.get(o); if (s) o.scale.copy(s);
-          o.rotation.set(0,0,0);
-        }
-      });
-    }
-
-    function applyPreset(p){
-      // height: scale Hips root Y and leg lengths together; we apply distributed scaling
-      currentRoot.traverse(o=>{
-        if (!o.isBone) return;
-        const n = o.name || '';
-        const S = (sx,sy,sz)=>o.scale.set(sx,sy,sz);
-
-        // Torso
-        if (includesAny(n, ['Hips','Spine','Spine1','Spine2'])) scaleBone(o, p.torso, 'y');
-        if (includesAny(n, ['Neck'])) scaleBone(o, p.neck, 'y');
-        if (includesAny(n, ['Head'])) S(p.head,p.head,p.head);
-
-        // Arms
-        if (includesAny(n, ['LeftArm','RightArm','UpperArm'])) scaleBone(o, p.uarm, 'y');
-        if (includesAny(n, ['LeftForeArm','RightForeArm','LowerArm'])) scaleBone(o, p.larm, 'y');
-        if (includesAny(n, ['LeftHand','RightHand'])) S(p.hand,p.hand,p.hand);
-
-        // Legs
-        if (includesAny(n, ['LeftUpLeg','RightUpLeg','UpperLeg'])) scaleBone(o, p.uleg, 'y');
-        if (includesAny(n, ['LeftLeg','RightLeg','LowerLeg'])) scaleBone(o, p.lleg, 'y');
-        if (includesAny(n, ['LeftFoot','RightFoot','LeftToeBase','RightToeBase'])) S(p.foot,p.foot,p.foot);
-      });
-
-      // Global height multiplier: scale hips root
-      const hips = findBoneByNames(['Hips','mixamorig:Hips','hips']);
-      if (hips){ hips.scale.y *= p.height; }
-      applyMaterial();
-    }
-
-    function scaleBone(bone, factor, axis='y'){
-      const s = bindScales.get(bone) || new THREE.Vector3(1,1,1);
-      if (axis==='y') bone.scale.set(s.x, s.y*factor, s.z);
-      else bone.scale.multiplyScalar(factor);
-    }
-    function includesAny(name, arr){ name = name.toLowerCase(); return arr.some(a=>name.includes(a.toLowerCase())); }
-    function findBoneByNames(names){
-      let found=null;
-      currentRoot.traverse(o=>{ if(o.isBone && names.some(n=>o.name.toLowerCase().includes(n.toLowerCase()))) found=o; });
-      return found;
-    }
-
-    // Presets (localStorage)
-    const presetSelect = qs('#presetSelect');
-    function loadPresetList(){
-      presetSelect.innerHTML = '';
-      const all = JSON.parse(localStorage.getItem('pml-presets')||'[]');
-      all.forEach((p,i)=>{
-        const opt = document.createElement('option'); opt.value=String(i); opt.textContent=p.name; presetSelect.appendChild(opt);
-      });
-      if (!all.length){ savePreset('Default'); }
-    }
-    function savePreset(name){
-      const all = JSON.parse(localStorage.getItem('pml-presets')||'[]');
-      all.push({ name, data: slidersToPreset() });
-      localStorage.setItem('pml-presets', JSON.stringify(all));
-      loadPresetList();
-    }
-    function applyPresetFromList(){
-      const all = JSON.parse(localStorage.getItem('pml-presets')||'[]');
-      const idx = +presetSelect.value; const rec = all[idx]; if(!rec) return;
-      setSliders(rec.data); applyPreset(rec.data);
-    }
-    function setSliders(p){
-      const set=(id,val)=>{ const el=qs('#'+id); el.value=String(val); const vv=qs('#v'+id.substring(1).replace(/^./,c=>c.toUpperCase())); vv && (vv.textContent=Number(val).toFixed(2)); };
-      set('pHeight',p.height); set('pTorso',p.torso); set('pNeck',p.neck); set('pHead',p.head);
-      set('pUArm',p.uarm); set('pLArm',p.larm); set('pULeg',p.uleg); set('pLLeg',p.lleg);
-      set('pHand',p.hand); set('pFoot',p.foot);
-      qs('#mColor').value = p.color || '#a6e1ff';
-      qs('#mMetal').value = p.metal ?? 0.1; qs('#vMetal').textContent = (+qs('#mMetal').value).toFixed(2);
-      qs('#mRough').value = p.rough ?? 0.65; qs('#vRough').textContent = (+qs('#mRough').value).toFixed(2);
-      qs('#mNorm').value  = p.norm ?? 1;    qs('#vNorm').textContent  = (+qs('#mNorm').value).toFixed(2);
-      qs('#mEmi').value   = p.emi  ?? 0;    qs('#vEmi').textContent   = (+qs('#mEmi').value).toFixed(2);
-    }
-    qs('#presetSave').addEventListener('click',()=>{
-      const n = prompt('Preset name:','Custom'); if(!n) return; savePreset(n);
-    });
-    qs('#presetDelete').addEventListener('click',()=>{
-      const all = JSON.parse(localStorage.getItem('pml-presets')||'[]');
-      const idx = +presetSelect.value; if (isNaN(idx)) return;
-      all.splice(idx,1); localStorage.setItem('pml-presets', JSON.stringify(all)); loadPresetList();
-    });
-    presetSelect.addEventListener('change', applyPresetFromList);
-    loadPresetList(); presetSelect.value='0';
-
-    // ---------- Exporters ----------
-    function downloadJSON(obj, name='data.json'){
-      const str = JSON.stringify(obj);
-      const blob = new Blob([str], {type:'application/json'});
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click();
-      setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
-    }
 
     function exportGLB(){
-      if (!currentRoot.children.length){ alert('Load an FBX first'); return; }
-      const exporter = new GLTFExporter();
-      exporter.parse(currentRoot, glb=>{
-        const isBinary = glb instanceof ArrayBuffer;
-        const blob = new Blob([isBinary? glb : JSON.stringify(glb)], {type: isBinary ? 'model/gltf-binary' : 'model/gltf+json'});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = isBinary ? 'model.glb' : 'model.gltf'; a.click();
-        setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
-      }, {
-        binary:true,
-        animations: currentRoot.animations || [],
-        trs:false, onlyVisible:true, truncateDrawRange:true, embedImages:true
-      });
+      if(!model) return alert("No model loaded!");
+      const exporter = new THREE.GLTFExporter();
+      exporter.parse(model, glb=>{
+        const blob = new Blob([glb], {type:'model/gltf-binary'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'export.glb';
+        a.click();
+        console.log("Model exported as export.glb");
+      }, {binary:true});
     }
 
-    // ---------- Animate ----------
     function animate(){
       requestAnimationFrame(animate);
-      const dt = clock.getDelta();
       controls.update();
-      if (mixer) mixer.update(dt);
-      // simple move towards target
-      const obj = currentRoot.children[0];
-      if (obj && moveTarget){
-        const p = obj.position;
-        const dir = moveTarget.clone().sub(p); const dist = dir.length();
-        const speed = 1.6; // m/s
-        if (dist>0.02){
-          dir.normalize(); p.addScaledVector(dir, Math.min(speed*dt, dist));
-        }else{
-          moveTarget = null;
-        }
-      }
       renderer.render(scene, camera);
     }
     animate();
 
-    // Resize
-    addEventListener('resize', ()=>{
-      const topH = Math.round(innerHeight*0.56);
-      renderer.setSize(innerWidth, topH);
-      camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    addEventListener('resize',()=>{
+      camera.aspect = innerWidth/innerHeight;
       camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth,innerHeight);
     });
 
-    // Helpers
-    function qs(s,root=document){ return root.querySelector(s); }
-    function qsa(s,root=document){ return Array.from(root.querySelectorAll(s)); }
-
-    // Cache original bone scales whenever a model loads
-    const observer = new MutationObserver(()=>{ cacheBindScales(); });
-    observer.observe(qs('#panelWrap'), { childList:true, subtree:true });
-
-    // Minimal SW via Blob (keeps this single-file)
-    if ('serviceWorker' in navigator){
-      const swCode = `
-        self.addEventListener('install', e=>{ self.skipWaiting(); });
-        self.addEventListener('activate', e=>{ e.waitUntil(self.clients.claim()); });
-        self.addEventListener('fetch', e=>{
-          e.respondWith((async()=>{
-            try{ return await fetch(e.request); }catch(err){ return caches.match(e.request) || Response.error(); }
-          })());
-        });
-      `;
-      const blob = new Blob([swCode], {type:'text/javascript'});
-      navigator.serviceWorker.register(URL.createObjectURL(blob));
-    }
+    // Hide initial loader after boot
+    setTimeout(()=>loadingEl.style.display="none",1000);
   </script>
 </body>
 </html>
