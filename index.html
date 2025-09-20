@@ -13,7 +13,7 @@
         &quot;theme_color&quot;: &quot;#3a79cc&quot;,
         &quot;description&quot;: &quot;A tool to configure wardrobe and equipment for GLB characters.&quot;,
         &quot;icons&quot;: [{
-            &quot;src&quot;: &quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAAaklEQVR4nO3BMQEAAADCoPVPbQ0PoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACeDc1wAAGaT44gAAAAAElFTkSuQmCC&quot;,
+            &quot;src&quot;: &quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAAaklEQVR4nO3BMQEAAADCoPVPbQ0PoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACeDc1wAAGaT44gAAAAAElFTSuQmCC&quot;,
             &quot;sizes&quot;: &quot;192x192&quot;,
             &quot;type&quot;: &quot;image/png&quot;
         }]
@@ -44,8 +44,8 @@
         .btn.secondary { background: #6c757d; }
         .btn.tertiary { background: #5a3acc; }
         input[type="file"] { display: none; }
-        #anim-controls, #anim-controls2 { display: none; flex-grow: 2; display: flex; gap: 5px; }
-        #anim-controls .btn, #anim-controls2 .btn { padding: 10px 0; min-width: 40px; }
+        .anim-controls-container { display: none; flex-grow: 2; display: flex; gap: 5px; }
+        .anim-controls-container .btn { padding: 10px 0; min-width: 40px; }
         #tab-bar { display: flex; overflow-x: auto; padding: 5px; background: #e9e9e9; flex-shrink: 0; }
         .tab-btn { padding: 8px 16px; border: none; background: transparent; border-bottom: 2px solid transparent; cursor: pointer; font-size: 14px; flex-shrink: 0; }
         .tab-btn.active { font-weight: bold; color: var(--primary-color); border-bottom-color: var(--primary-color); }
@@ -72,20 +72,20 @@
             <button class="btn" id="loadCharacterBtn">Load Character</button>
             <button class="btn" id="loadAssetBtn">Load Asset</button>
             <button class="btn tertiary" id="loadAnimBtn">Load Animation</button>
-            <div id="anim-controls">
-                <button class="btn secondary" id="animStepBackBtn">&lt;&lt;</button>
-                <button class="btn secondary" id="animPlayPauseBtn">Pause</button>
-                <button class="btn secondary" id="animStepFwdBtn">&gt;&gt;</button>
+            <div class="anim-controls-container">
+                <button class="btn secondary step-back-btn">&lt;&lt;</button>
+                <button class="btn secondary play-pause-btn">Pause</button>
+                <button class="btn secondary step-fwd-btn">&gt;&gt;</button>
             </div>
             <button class="btn secondary" id="copyEquipmentBtn">Copy Equipment</button>
         </div>
         <div id="wardrobe-ui" class="mode-ui">
             <button class="btn" id="loadCharacterBtn2">Load Character</button>
             <button class="btn" id="loadClothingBtn">Load Clothing</button>
-            <div id="anim-controls2">
-                <button class="btn secondary" id="animStepBackBtn2">&lt;&lt;</button>
-                <button class="btn secondary" id="animPlayPauseBtn2">Pause</button>
-                <button class="btn secondary" id="animStepFwdBtn2">&gt;&gt;</button>
+            <div class="anim-controls-container">
+                <button class="btn secondary step-back-btn">&lt;&lt;</button>
+                <button class="btn secondary play-pause-btn">Pause</button>
+                <button class="btn secondary step-fwd-btn">&gt;&gt;</button>
             </div>
             <button class="btn secondary" id="copyWardrobeBtn">Copy Wardrobe</button>
         </div>
@@ -113,7 +113,6 @@
         const canvasContainer = document.getElementById('canvas-container');
         const controlPanelsContainer = document.getElementById('control-panels');
         const tabBarContainer = document.getElementById('tab-bar');
-        const animControls = document.getElementById('anim-controls');
         
         // --- Scene Setup ---
         const scene = new THREE.Scene();
@@ -224,12 +223,9 @@
                     const action = mainCharacter.mixer.clipAction(clip);
                     action.setLoop(THREE.LoopRepeat, Infinity).play();
                     mainCharacter.activeAction = action;
-
-                    // --- THE FIX IS HERE ---
-                    mainCharacter.isPaused = false; // Set to not paused
-                    mainCharacter.mixer.timeScale = 1; // Set speed to normal
+                    mainCharacter.isPaused = false;
+                    mainCharacter.mixer.timeScale = 1;
                     document.querySelectorAll('.play-pause-btn').forEach(btn => btn.textContent = 'Pause');
-                    
                     document.querySelectorAll('.anim-controls-container').forEach(el => el.style.display = 'flex');
                 });
             };
@@ -309,11 +305,11 @@
             const { mesh } = objectData;
             panel.querySelectorAll('input[type="range"], input[type="number"]').forEach(input => {
                 input.addEventListener('input', () => {
-                    mesh.position.set(parseFloat(panel.querySelector('[id^="pos-x-"]').value), parseFloat(panel.querySelector('[id^="pos-y-"]').value), parseFloat(panel.querySelector('[id^="pos-z-"]').value));
-                    mesh.rotation.set(THREE.MathUtils.degToRad(parseFloat(panel.querySelector('[id^="rot-x-"]').value)), THREE.MathUtils.degToRad(parseFloat(panel.querySelector('[id^="rot-y-"]').value)), THREE.MathUtils.degToRad(parseFloat(panel.querySelector('[id^="rot-z-"]').value)));
-                    const scale = parseFloat(panel.querySelector('[id^="scale-all-"]').value);
+                    const getVal = (id) => parseFloat(panel.querySelector(`[id^="${id}-"]`).value);
+                    mesh.position.set(getVal('pos-x'), getVal('pos-y'), getVal('pos-z'));
+                    mesh.rotation.set(THREE.MathUtils.degToRad(getVal('rot-x')), THREE.MathUtils.degToRad(getVal('rot-y')), THREE.MathUtils.degToRad(getVal('rot-z')));
+                    const scale = getVal('scale-all');
                     mesh.scale.set(scale, scale, scale);
-                    // Sync number and range inputs
                     if (input.type === 'range') panel.querySelector(`#${input.id.replace(/-range$/, '-num')}`).value = input.value;
                     if (input.type === 'number') panel.querySelector(`#${input.id.replace(/-num$/, '-range')}`).value = input.value;
                 });
@@ -360,7 +356,6 @@
         }
         document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
 
-        // --- Copy Logic ---
         function copyEquipment() {
             if (!activeObjectId || !sceneObjects.has(activeObjectId)) { alert("Select an asset."); return; }
             const { mesh } = sceneObjects.get(activeObjectId);
@@ -368,9 +363,8 @@
             const { position: pos, rotation: rot, scale: scl } = mesh;
             const output = `// Transform for ${mesh.name} attached to ${mesh.parent.name}\n` + `object.position.set(${pos.x.toFixed(4)}, ${pos.y.toFixed(4)}, ${pos.z.toFixed(4)});\n` + `object.rotation.set(${rot.x.toFixed(4)}, ${rot.y.toFixed(4)}, ${rot.z.toFixed(4)}); // Radians\n` + `object.scale.set(${scl.x.toFixed(4)}, ${scl.y.toFixed(4)}, ${scl.z.toFixed(4)});`;
             navigator.clipboard.writeText(output).then(() => {
-                const btn = document.getElementById('copyEquipmentBtn');
-                btn.textContent = 'Copied!';
-                setTimeout(() => btn.textContent = 'Copy Equipment', 1500);
+                document.getElementById('copyEquipmentBtn').textContent = 'Copied!';
+                setTimeout(() => document.getElementById('copyEquipmentBtn').textContent = 'Copy Equipment', 1500);
             });
         }
         function copyWardrobe() {
@@ -386,9 +380,8 @@
                 }))
             };
             navigator.clipboard.writeText(JSON.stringify(wardrobeData, null, 2)).then(() => {
-                const btn = document.getElementById('copyWardrobeBtn');
-                btn.textContent = 'Copied!';
-                setTimeout(() => btn.textContent = 'Copy Wardrobe', 1500);
+                document.getElementById('copyWardrobeBtn').textContent = 'Copied!';
+                setTimeout(() => document.getElementById('copyWardrobeBtn').textContent = 'Copy Wardrobe', 1500);
             });
         }
 
@@ -428,11 +421,6 @@
             stepBackBtn.addEventListener('click', () => step(-1/60));
         };
         
-        // I noticed some IDs were duplicated. I've cleaned this up to use classes for shared behavior.
-        // Also, the anim-controls for the wardrobe section was missing from the HTML. I've added it.
-        // I've also corrected the event listener setup.
-        // The previous code had a bug where it was trying to query for elements that didn't exist
-        // and duplicated IDs, which is invalid HTML.
         document.querySelectorAll('.anim-controls-container').forEach(setupAnimListeners);
     </script>
 </body>
