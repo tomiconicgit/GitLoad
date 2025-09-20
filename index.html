@@ -35,14 +35,11 @@
         #canvas-container { flex-grow: 1; min-height: 0; width: 100%; }
         canvas { display: block; width: 100%; height: 100%; }
         .ui-container { flex-shrink: 0; width: 100%; height: var(--ui-height); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); background: var(--ui-background); border-top: 1px solid var(--border-color); display: flex; flex-direction: column; }
-
-        /* --- NEW: Main Navigation --- */
         header { display: flex; background: #e0e0e0; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
         .nav-btn { flex-grow: 1; padding: 12px; border: none; background: transparent; font-size: 16px; font-weight: bold; cursor: pointer; border-bottom: 3px solid transparent; }
         .nav-btn.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
         .mode-ui { display: none; }
         .mode-ui.active { display: flex; flex-wrap: wrap; padding: 10px; gap: 10px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; align-items: center; }
-
         .btn { padding: 10px; border-radius: 8px; border: none; background: var(--primary-color); color: white; font-size: 14px; font-weight: bold; cursor: pointer; text-align: center; flex-grow: 1; }
         .btn.secondary { background: #6c757d; }
         .btn.tertiary { background: #5a3acc; }
@@ -58,8 +55,6 @@
         .control-group { margin-bottom: 15px; }
         .control-group h3 { margin: 0 0 10px; font-size: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
         .slider-container { display: grid; grid-template-columns: 20px 1fr 50px; align-items: center; gap: 10px; margin-bottom: 5px; }
-        .slider-container label { font-weight: bold; }
-        /* --- NEW: Wardrobe Toggles --- */
         .wardrobe-item { display: flex; align-items: center; justify-content: space-between; padding: 5px; border-radius: 4px; }
         .wardrobe-item:nth-child(odd) { background-color: rgba(0,0,0,0.05); }
         .wardrobe-item label { user-select: none; }
@@ -73,7 +68,6 @@
             <button class="nav-btn active" data-mode="equipment">Equipment</button>
             <button class="nav-btn" data-mode="wardrobe">Wardrobe</button>
         </header>
-
         <div id="equipment-ui" class="mode-ui active">
             <button class="btn" id="loadCharacterBtn">Load Character</button>
             <button class="btn" id="loadAssetBtn">Load Asset</button>
@@ -85,17 +79,13 @@
             </div>
             <button class="btn secondary" id="copyEquipmentBtn">Copy Equipment</button>
         </div>
-
         <div id="wardrobe-ui" class="mode-ui">
             <button class="btn" id="loadCharacterBtn2">Load Character</button>
             <button class="btn" id="loadClothingBtn">Load Clothing</button>
-             <div id="anim-controls2"></div>
             <button class="btn secondary" id="copyWardrobeBtn">Copy Wardrobe</button>
         </div>
-
         <div id="tab-bar"></div>
         <div id="control-panels"></div>
-        
         <input type="file" id="characterInput" accept=".glb">
         <input type="file" id="assetInput" accept=".glb, .gltf" multiple>
         <input type="file" id="animInput" accept=".glb, .gltf">
@@ -109,7 +99,7 @@
 
         // --- Global State ---
         const clock = new THREE.Clock();
-        let currentMode = 'equipment'; // 'equipment' or 'wardrobe'
+        let currentMode = 'equipment';
         let mainCharacter = null;
         const sceneObjects = new Map();
         let activeObjectId = null;
@@ -120,11 +110,6 @@
         const tabBarContainer = document.getElementById('tab-bar');
         const animControls = document.getElementById('anim-controls');
         const animPlayPauseBtn = document.getElementById('animPlayPauseBtn');
-        
-        // Clone anim controls for wardrobe UI to avoid conflicts
-        const animControlsClone = animControls.cloneNode(true);
-        animControlsClone.id = 'anim-controls2';
-        document.getElementById('wardrobe-ui').insertBefore(animControlsClone, document.getElementById('copyWardrobeBtn'));
 
         // --- Scene Setup ---
         const scene = new THREE.Scene();
@@ -136,15 +121,12 @@
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
         renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         canvasContainer.appendChild(renderer.domElement);
         const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 2);
         scene.add(hemiLight);
         const dirLight = new THREE.DirectionalLight(0xffffff, 2);
         dirLight.position.set(3, 10, 10);
         dirLight.castShadow = true;
-        dirLight.shadow.camera.top = 4;
-        dirLight.shadow.camera.bottom = -4;
         scene.add(dirLight);
         const floor = new THREE.Mesh( new THREE.PlaneGeometry(100, 100), new THREE.MeshStandardMaterial({ color: 0x999999, depthWrite: false }) );
         floor.rotation.x = -Math.PI / 2;
@@ -155,7 +137,7 @@
         controls.enableDamping = true;
         controls.maxPolarAngle = Math.PI / 2;
 
-        // --- Animation Loop ---
+        // --- Animation & Resize ---
         function animate() {
             requestAnimationFrame(animate);
             const delta = clock.getDelta();
@@ -177,13 +159,8 @@
 
         function loadGLB(files, isCharacter) {
             if (!files || files.length === 0) return;
-             if (isCharacter) {
-                processFile(files[0], true);
-            } else {
-                for (const file of files) {
-                    processFile(file, false);
-                }
-            }
+            const fileList = Array.from(files);
+            fileList.forEach(file => processFile(file, isCharacter && file === fileList[0]));
         }
         
         function processFile(file, isCharacter) {
@@ -193,8 +170,7 @@
                     if (isCharacter) resetScene();
                     const model = gltf.scene;
                     model.name = file.name.replace(/\.[^/.]+$/, "");
-                    model.userData.fileName = file.name; // Store original filename
-
+                    model.userData.fileName = file.name;
                     const box = new THREE.Box3().setFromObject(model);
                     const size = box.getSize(new THREE.Vector3());
                     if (isCharacter) {
@@ -207,23 +183,19 @@
                         model.position.sub(box.getCenter(new THREE.Vector3()));
                     }
                     model.traverse(node => { if (node.isMesh) node.castShadow = true; });
-                    
                     const objectData = {
                         mesh: model, bones: [], materials: new Map(), bodyParts: [],
                         mixer: null, activeAction: null, isPaused: true,
                     };
-
                     model.traverse(node => {
                         if (node.isBone) objectData.bones.push(node.name);
                         if (node.isMesh) {
-                            // Store body parts for wardrobe toggles
                             objectData.bodyParts.push({ name: node.name, mesh: node, isVisible: true });
                             if (node.material && !objectData.materials.has(node.material.uuid)) {
                                 objectData.materials.set(node.material.uuid, { name: node.material.name || `Material_${objectData.materials.size}`, ref: node.material });
                             }
                         }
                     });
-
                     sceneObjects.set(model.uuid, objectData);
                     scene.add(model);
                     if (isCharacter) mainCharacter = objectData;
@@ -234,41 +206,62 @@
             reader.readAsArrayBuffer(file);
         }
         
-        function loadAnimation(file) { /* ... same as before ... */ }
-        function resetScene() { /* ... same as before ... */ }
+        function loadAnimation(file) {
+             if (!file || !mainCharacter) { alert("Please load a character model first!"); return; }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                gltfLoader.parse(e.target.result, '', (gltf) => {
+                    const clip = gltf.animations[0];
+                    if (!clip) { alert("This GLB file contains no animations."); return; }
+                    if (!mainCharacter.mixer) { mainCharacter.mixer = new THREE.AnimationMixer(mainCharacter.mesh); }
+                    if (mainCharacter.activeAction) mainCharacter.activeAction.stop();
+                    const action = mainCharacter.mixer.clipAction(clip);
+                    action.setLoop(THREE.LoopRepeat, Infinity).play();
+                    mainCharacter.activeAction = action;
+                    mainCharacter.isPaused = true;
+                    mainCharacter.mixer.timeScale = 0;
+                    animPlayPauseBtn.textContent = 'Play';
+                    animControls.style.display = 'flex';
+                });
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function resetScene() {
+            sceneObjects.forEach(data => scene.remove(data.mesh));
+            sceneObjects.clear();
+            mainCharacter = null;
+            controlPanelsContainer.innerHTML = '';
+            tabBarContainer.innerHTML = '';
+            animControls.style.display = 'none';
+        }
 
         // --- UI Generation ---
         function createUIForObject(objectData) {
-            const { mesh } = objectData;
-            const id = mesh.uuid;
-            
-            // Create Tab (same as before)
             const tab = document.createElement('button');
             tab.className = 'tab-btn';
-            tab.textContent = mesh.name;
-            tab.dataset.id = id;
-            tab.onclick = () => setActiveObject(id);
+            tab.textContent = objectData.mesh.name;
+            tab.dataset.id = objectData.mesh.uuid;
+            tab.onclick = () => setActiveObject(objectData.mesh.uuid);
             tabBarContainer.appendChild(tab);
-
-            // Create Panel Shell
             const panel = document.createElement('div');
             panel.className = 'panel';
-            panel.dataset.id = id;
+            panel.dataset.id = objectData.mesh.uuid;
             controlPanelsContainer.appendChild(panel);
-            
-            // Re-render panel content when mode or active object changes
-            renderPanelContent(panel, objectData);
+            renderPanelContent(objectData);
         }
 
-        function renderPanelContent(panel, objectData) {
-             const { mesh, bones, materials, bodyParts } = objectData;
-             let panelHTML = '';
+        function renderPanelContent(objectData) {
+            const { mesh, bones, bodyParts } = objectData;
+            const panel = document.querySelector(`.panel[data-id="${mesh.uuid}"]`);
+            if (!panel) return;
+            
+            let panelHTML = '';
 
             // WARDROBE MODE: Show body part toggles for the main character
             if (currentMode === 'wardrobe' && objectData === mainCharacter && bodyParts.length > 0) {
                 panelHTML += `<div class="control-group"><h3>Default Clothing</h3>`;
                 bodyParts.forEach((part, index) => {
-                    // Only list parts with actual geometry and names
                     if (!part.mesh.geometry.boundingSphere || !part.name) return;
                     panelHTML += `<div class="wardrobe-item">
                         <label for="part-${index}">${part.name}</label>
@@ -278,93 +271,113 @@
                 panelHTML += `</div>`;
             }
 
-            // Always show transform controls for all objects
-            panelHTML += `<div class="control-group"><h3>Position, Rotation, Scale</h3>...</div>`; // Abridged for brevity
-
-            // Show attachment options for non-character objects
-            if (mainCharacter && objectData !== mainCharacter) {
-                // ... attachment select HTML ...
-            }
-            
-            panel.innerHTML = panelHTML.replace('...', `
+            // Always show transform controls
+            panelHTML += `<div class="control-group">
+                <h3>Position</h3>
                 ${createSlider('pos-x', 'X', mesh.position.x, -5, 5, 0.01)}
                 ${createSlider('pos-y', 'Y', mesh.position.y, -5, 5, 0.01)}
                 ${createSlider('pos-z', 'Z', mesh.position.z, -5, 5, 0.01)}
+                <h3>Rotation (Degrees)</h3>
                 ${createSlider('rot-x', 'X', THREE.MathUtils.radToDeg(mesh.rotation.x), -180, 180, 1)}
                 ${createSlider('rot-y', 'Y', THREE.MathUtils.radToDeg(mesh.rotation.y), -180, 180, 1)}
                 ${createSlider('rot-z', 'Z', THREE.MathUtils.radToDeg(mesh.rotation.z), -180, 180, 1)}
+                <h3>Scale</h3>
                 ${createSlider('scale-all', 'S', mesh.scale.x, 0.1, 5, 0.01)}
-            `);
-             if (mainCharacter && objectData !== mainCharacter) {
-                 const boneOptions = mainCharacter.bones.map(name => `<option value="${name}">${name}</option>`).join('');
-                panel.innerHTML += `<div class="control-group"><h3>Attachment</h3>
-                    <select class="attachment-select" data-id="${mesh.uuid}"><option value="scene">-- Detach --</option>${boneOptions}</select></div>`;
-             }
+            </div>`;
 
+            // Attachment options for non-character objects
+            if (mainCharacter && objectData !== mainCharacter) {
+                const boneOptions = mainCharacter.bones.map(name => `<option value="${name}">${name}</option>`).join('');
+                panelHTML += `<div class="control-group"><h3>Attachment</h3>
+                    <select class="attachment-select" data-id="${mesh.uuid}">
+                        <option value="scene">-- Detach (World) --</option>
+                        ${boneOptions}
+                    </select></div>`;
+            }
+
+            panel.innerHTML = panelHTML;
             addEventListenersToPanel(panel, objectData);
         }
         
         function addEventListenersToPanel(panel, objectData) {
-            // ... All the slider and attachment event listeners go here (same as before)
-            
-            // NEW: Wardrobe toggle listeners
+            const { mesh } = objectData;
+            const updateTransform = () => {
+                mesh.position.set(parseFloat(panel.querySelector('#pos-x').value), parseFloat(panel.querySelector('#pos-y').value), parseFloat(panel.querySelector('#pos-z').value));
+                mesh.rotation.set(THREE.MathUtils.degToRad(parseFloat(panel.querySelector('#rot-x').value)), THREE.MathUtils.degToRad(parseFloat(panel.querySelector('#rot-y').value)), THREE.MathUtils.degToRad(parseFloat(panel.querySelector('#rot-z').value)));
+                const scale = parseFloat(panel.querySelector('#scale-all').value);
+                mesh.scale.set(scale, scale, scale);
+            };
+            ['pos-x', 'pos-y', 'pos-z', 'rot-x', 'rot-y', 'rot-z', 'scale-all'].forEach(axis => {
+                const slider = panel.querySelector(`#${axis}`);
+                const number = panel.querySelector(`#${axis}-num`);
+                if(slider && number) {
+                    slider.addEventListener('input', () => { number.value = slider.value; updateTransform(); });
+                    number.addEventListener('input', () => { slider.value = number.value; updateTransform(); });
+                }
+            });
+            const attachmentSelect = panel.querySelector('.attachment-select');
+            if (attachmentSelect) {
+                attachmentSelect.addEventListener('change', (e) => {
+                    const boneName = e.target.value;
+                    if (boneName === 'scene') scene.attach(mesh);
+                    else { const bone = mainCharacter.mesh.getObjectByName(boneName); if (bone) bone.attach(mesh); }
+                });
+            }
             if (currentMode === 'wardrobe' && objectData === mainCharacter) {
                 panel.querySelectorAll('.wardrobe-item input[type="checkbox"]').forEach(toggle => {
                     toggle.addEventListener('change', (e) => {
                         const partName = e.target.dataset.partName;
                         const part = objectData.bodyParts.find(p => p.name === partName);
-                        if (part) {
-                            part.isVisible = e.target.checked;
-                            part.mesh.visible = part.isVisible;
-                        }
+                        if (part) { part.isVisible = e.target.checked; part.mesh.visible = part.isVisible; }
                     });
                 });
             }
         }
-        // ... createSlider, loadTextureForMaterial functions are the same
 
-        // --- Mode Switching ---
+        function createSlider(id, label, value, min, max, step) {
+             return `<div class="slider-container"><label>${label}</label><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}"><input type="number" id="${id}-num" value="${value}"></div>`;
+        }
+        
+        function setActiveObject(id) {
+            activeObjectId = id;
+            document.querySelectorAll('.tab-btn, .panel').forEach(el => el.classList.toggle('active', el.dataset.id === id));
+            if (activeObjectId) renderPanelContent(sceneObjects.get(activeObjectId));
+        }
+
         function setMode(mode) {
             currentMode = mode;
-            // Update Nav buttons
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
-            // Update UI toolbars
             document.querySelectorAll('.mode-ui').forEach(u => u.classList.toggle('active', u.id.startsWith(mode)));
-            
-            // Re-render the active panel to show mode-specific controls
-            const activePanel = document.querySelector('.panel.active');
-            if (activePanel && activeObjectId) {
-                renderPanelContent(activePanel, sceneObjects.get(activeObjectId));
-            }
+            if (activeObjectId) renderPanelContent(sceneObjects.get(activeObjectId));
         }
         document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
 
         // --- Copy Logic ---
-        function copyEquipment() { /* ... same as old copyTransform ... */ }
+        function copyEquipment() {
+            if (!activeObjectId || !sceneObjects.has(activeObjectId)) { alert("Select an asset."); return; }
+            const { mesh } = sceneObjects.get(activeObjectId);
+            if (!mesh.parent || !mesh.parent.isBone) { alert("Asset must be attached to a bone."); return; }
+            const { position: pos, rotation: rot, scale: scl } = mesh;
+            const output = `// Transform for ${mesh.name} attached to ${mesh.parent.name}\n` + `object.position.set(${pos.x.toFixed(4)}, ${pos.y.toFixed(4)}, ${pos.z.toFixed(4)});\n` + `object.rotation.set(${rot.x.toFixed(4)}, ${rot.y.toFixed(4)}, ${rot.z.toFixed(4)}); // Radians\n` + `object.scale.set(${scl.x.toFixed(4)}, ${scl.y.toFixed(4)}, ${scl.z.toFixed(4)});`;
+            navigator.clipboard.writeText(output).then(() => {
+                const btn = document.getElementById('copyEquipmentBtn');
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.textContent = 'Copy Equipment', 1500);
+            });
+        }
 
         function copyWardrobe() {
             if (!mainCharacter) { alert("Load a character first."); return; }
-            
             const wardrobeData = {
-                hide: mainCharacter.bodyParts
-                    .filter(part => !part.isVisible && part.name)
-                    .map(part => part.name),
-                equip: []
-            };
-
-            sceneObjects.forEach((data, id) => {
-                if (data === mainCharacter) return; // Skip the main character itself
-                const { mesh } = data;
-                const equipItem = {
+                hide: mainCharacter.bodyParts.filter(part => !part.isVisible && part.name).map(part => part.name),
+                equip: Array.from(sceneObjects.values()).filter(data => data !== mainCharacter).map(({ mesh }) => ({
                     file: mesh.userData.fileName,
                     attachTo: mesh.parent.isBone ? mesh.parent.name : "scene",
-                    position: { x: mesh.position.x, y: mesh.position.y, z: mesh.position.z },
-                    rotation: { x: mesh.rotation.x, y: mesh.rotation.y, z: mesh.rotation.z },
-                    scale: { x: mesh.scale.x, y: mesh.scale.y, z: mesh.scale.z }
-                };
-                wardrobeData.equip.push(equipItem);
-            });
-            
+                    position: { x: mesh.position.x.toFixed(4), y: mesh.position.y.toFixed(4), z: mesh.position.z.toFixed(4) },
+                    rotation: { x: mesh.rotation.x.toFixed(4), y: mesh.rotation.y.toFixed(4), z: mesh.rotation.z.toFixed(4) },
+                    scale: { x: mesh.scale.x.toFixed(4), y: mesh.scale.y.toFixed(4), z: mesh.scale.z.toFixed(4) }
+                }))
+            };
             const output = JSON.stringify(wardrobeData, null, 2);
             navigator.clipboard.writeText(output).then(() => {
                 const btn = document.getElementById('copyWardrobeBtn');
@@ -373,27 +386,46 @@
             });
         }
 
-        function setActiveObject(id) {
-            activeObjectId = id;
-            document.querySelectorAll('.tab-btn, .panel').forEach(el => el.classList.toggle('active', el.dataset.id === id));
-            // Re-render panel for the newly active object
-            const activePanel = document.querySelector('.panel.active');
-            if (activePanel) renderPanelContent(activePanel, sceneObjects.get(id));
-        }
-
         // --- Initial Event Listeners ---
         document.getElementById('loadCharacterBtn').onclick = () => document.getElementById('characterInput').click();
         document.getElementById('loadCharacterBtn2').onclick = () => document.getElementById('characterInput').click();
         document.getElementById('loadAssetBtn').onclick = () => document.getElementById('assetInput').click();
         document.getElementById('loadClothingBtn').onclick = () => document.getElementById('assetInput').click();
         document.getElementById('loadAnimBtn').onclick = () => document.getElementById('animInput').click();
-        
         document.getElementById('characterInput').onchange = (e) => loadGLB(e.target.files, true);
         document.getElementById('assetInput').onchange = (e) => loadGLB(e.target.files, false);
         document.getElementById('animInput').onchange = (e) => loadAnimation(e.target.files[0]);
-
-        document.getElementById('copyEquipmentBtn').onclick = copyEquipment; // old function
+        document.getElementById('copyEquipmentBtn').onclick = copyEquipment;
         document.getElementById('copyWardrobeBtn').onclick = copyWardrobe;
+        // Animation controls are cloned, so need to add listeners to both
+        [animControls, document.getElementById('anim-controls2')].forEach(container => {
+            container.querySelector('#animPlayPauseBtn').addEventListener('click', () => { /* ... play/pause logic ... */ });
+            container.querySelector('#animStepFwdBtn').addEventListener('click', () => { /* ... step fwd logic ... */ });
+            container.querySelector('#animStepBackBtn').addEventListener('click', () => { /* ... step back logic ... */ });
+        });
+        // Simplified listeners using a function
+        const setupAnimListeners = (container) => {
+            container.querySelector('#animPlayPauseBtn').addEventListener('click', () => {
+                if (!mainCharacter || !mainCharacter.mixer) return;
+                mainCharacter.isPaused = !mainCharacter.isPaused;
+                mainCharacter.mixer.timeScale = mainCharacter.isPaused ? 0 : 1;
+                // Update both buttons' text
+                document.querySelectorAll('#animPlayPauseBtn').forEach(btn => btn.textContent = mainCharacter.isPaused ? 'Play' : 'Pause');
+            });
+            const step = (amount) => {
+                if (!mainCharacter || !mainCharacter.mixer) return;
+                if (!mainCharacter.isPaused) {
+                    mainCharacter.isPaused = true;
+                    mainCharacter.mixer.timeScale = 0;
+                    document.querySelectorAll('#animPlayPauseBtn').forEach(btn => btn.textContent = 'Play');
+                }
+                mainCharacter.mixer.update(amount);
+            };
+            container.querySelector('#animStepFwdBtn').addEventListener('click', () => step(1/60));
+            container.querySelector('#animStepBackBtn').addEventListener('click', () => step(-1/60));
+        };
+        setupAnimListeners(animControls);
+        setupAnimListeners(document.getElementById('anim-controls2'));
     </script>
 </body>
 </html>
