@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>GLB Texture Tool</title>
+    <title>GLB Attachment Tool</title>
     <link rel="manifest" href="data:application/manifest+json,{
-        &quot;name&quot;: &quot;GLB Texture Tool&quot;,
-        &quot;short_name&quot;: &quot;GLBTool&quot;,
+        &quot;name&quot;: &quot;GLB Attachment Tool&quot;,
+        &quot;short_name&quot;: &quot;GLB Attach&quot;,
         &quot;start_url&quot;: &quot;.&quot;,
         &quot;display&quot;: &quot;standalone&quot;,
-        &quot;background_color&quot;: &quot;#1e1e1e&quot;,
-        &quot;theme_color&quot;: &quot;#3a3a3a&quot;,
-        &quot;description&quot;: &quot;A simple tool to load a GLB, apply textures, and export.&quot;,
+        &quot;background_color&quot;: &quot;#d0d0d0&quot;,
+        &quot;theme_color&quot;: &quot;#3a79cc&quot;,
+        &quot;description&quot;: &quot;A tool to attach and transform GLB assets on a character rig.&quot;,
         &quot;icons&quot;: [{
             &quot;src&quot;: &quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAAaklEQVR4nO3BMQEAAADCoPVPbQ0PoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACeDc1wAAGaT44gAAAAAElFTkSuQmCC&quot;,
             &quot;sizes&quot;: &quot;192x192&quot;,
@@ -20,23 +20,52 @@
     }">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-title" content="GLBTool">
+    <meta name="apple-mobile-web-app-title" content="GLB Attach">
     <style>
-        body { margin: 0; background-color: #1e1e1e; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; touch-action: none; }
+        :root {
+            --primary-color: #3a79cc;
+            --background-color: #f0f0f0;
+            --ui-background: rgba(255, 255, 255, 0.8);
+            --text-color: #333;
+            --border-color: #ccc;
+        }
+        body { margin: 0; background-color: var(--background-color); color: var(--text-color); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; touch-action: none; overflow: hidden; }
         canvas { display: block; }
-        .ui { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.5); padding: 10px; box-sizing: border-box; display: flex; justify-content: space-around; align-items: center; gap: 10px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-        .btn { padding: 12px 15px; border-radius: 8px; border: none; background: #3a3a3a; color: white; font-size: 14px; font-weight: bold; cursor: pointer; flex-grow: 1; }
-        .btn:active { background: #555; }
+        .ui-container { position: fixed; bottom: 0; left: 0; width: 100%; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); background: var(--ui-background); border-top: 1px solid var(--border-color); }
+        .top-bar { display: flex; justify-content: space-around; padding: 10px; gap: 10px; border-bottom: 1px solid var(--border-color); }
+        .btn { padding: 12px 15px; border-radius: 8px; border: none; background: var(--primary-color); color: white; font-size: 14px; font-weight: bold; cursor: pointer; flex-grow: 1; text-align: center; }
+        .btn.secondary { background: #6c757d; }
+        .btn:active { opacity: 0.8; }
         input[type="file"] { display: none; }
+
+        #tab-bar { display: flex; overflow-x: auto; padding: 5px; background: #e9e9e9; }
+        .tab-btn { padding: 8px 16px; border: none; background: transparent; border-bottom: 2px solid transparent; cursor: pointer; font-size: 14px; flex-shrink: 0; }
+        .tab-btn.active { font-weight: bold; color: var(--primary-color); border-bottom-color: var(--primary-color); }
+        
+        #control-panels { padding: 15px; max-height: 40vh; overflow-y: auto; }
+        .panel { display: none; }
+        .panel.active { display: block; }
+        .control-group { margin-bottom: 15px; }
+        .control-group h3 { margin: 0 0 10px; font-size: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
+        .slider-container { display: grid; grid-template-columns: 20px 1fr 50px; align-items: center; gap: 10px; margin-bottom: 5px; }
+        .slider-container label { font-weight: bold; }
+        .slider-container input[type=range] { width: 100%; }
+        .slider-container input[type=number] { width: 50px; border: 1px solid var(--border-color); border-radius: 4px; padding: 2px; }
+        .attachment-select { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--border-color); }
+        .material-item { margin-bottom: 8px; }
     </style>
 </head>
 <body>
-    <div class="ui">
-        <button class="btn" onclick="document.getElementById('modelInput').click()">Load Model</button>
-        <button class="btn" onclick="document.getElementById('textureInput').click()">Load Texture</button>
-        <button class="btn" id="exportBtn">Export GLB</button>
-        <input type="file" id="modelInput" accept=".glb,.gltf">
-        <input type="file" id="textureInput" accept="image/*">
+    <div class="ui-container">
+        <div class="top-bar">
+            <button class="btn" id="loadCharacterBtn">Load Character</button>
+            <button class="btn" id="loadAssetBtn">Load Asset</button>
+            <button class="btn secondary" id="copyBtn">Copy Transform</button>
+            <input type="file" id="characterInput" accept=".glb">
+            <input type="file" id="assetInput" accept=".glb">
+        </div>
+        <div id="tab-bar"></div>
+        <div id="control-panels"></div>
     </div>
 
     <script type="importmap">
@@ -51,31 +80,62 @@
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-        import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 
-        // --- Basic Scene Setup ---
+        // --- Global State ---
+        let mainCharacter = null;
+        const sceneObjects = new Map();
+        let activeObjectId = null;
+
+        // --- UI Elements ---
+        const controlPanelsContainer = document.getElementById('control-panels');
+        const tabBarContainer = document.getElementById('tab-bar');
+        const copyBtn = document.getElementById('copyBtn');
+
+        // --- Scene Setup ---
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x1e1e1e);
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.z = 5;
+        scene.background = new THREE.Color(0xf0f0f0);
+        scene.fog = new THREE.Fog(0xf0f0f0, 10, 50);
+
+        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / (window.innerHeight - 200), 0.1, 1000);
+        camera.position.set(0, 1.5, 4);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.body.appendChild(renderer.domElement);
 
         // --- Lighting ---
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-        scene.add(ambientLight);
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-        directionalLight.position.set(5, 10, 7.5);
-        scene.add(directionalLight);
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 2);
+        hemiLight.position.set(0, 20, 0);
+        scene.add(hemiLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 2);
+        dirLight.position.set(3, 10, 10);
+        dirLight.castShadow = true;
+        dirLight.shadow.camera.top = 4;
+        dirLight.shadow.camera.bottom = -4;
+        dirLight.shadow.camera.left = -4;
+        dirLight.shadow.camera.right = 4;
+        dirLight.shadow.camera.near = 0.1;
+        dirLight.shadow.camera.far = 40;
+        scene.add(dirLight);
+
+        // --- Floor ---
+        const floor = new THREE.Mesh(
+            new THREE.PlaneGeometry(100, 100),
+            new THREE.MeshStandardMaterial({ color: 0x999999, depthWrite: false })
+        );
+        floor.rotation.x = -Math.PI / 2;
+        floor.receiveShadow = true;
+        scene.add(floor);
 
         // --- Controls ---
         const controls = new OrbitControls(camera, renderer.domElement);
+        controls.target.set(0, 1, 0);
         controls.enableDamping = true;
-
-        let currentModel = null;
+        controls.maxPolarAngle = Math.PI / 2;
 
         // --- Animation Loop ---
         function animate() {
@@ -87,102 +147,265 @@
 
         // --- Window Resize ---
         window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.aspect = window.innerWidth / (window.innerHeight - controlPanelsContainer.clientHeight - tabBarContainer.clientHeight);
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
-
-        // --- File Loaders ---
+        
+        // --- Core Logic ---
         const gltfLoader = new GLTFLoader();
-        const textureLoader = new THREE.TextureLoader();
 
-        // 1. Load GLB Model
-        document.getElementById('modelInput').addEventListener('change', (event) => {
-            const file = event.target.files[0];
+        function loadGLB(file, isCharacter) {
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = (e) => {
                 gltfLoader.parse(e.target.result, '', (gltf) => {
-                    // Clear previous model
-                    if (currentModel) {
-                        scene.remove(currentModel);
+                    if (isCharacter) resetScene();
+                    
+                    const model = gltf.scene;
+                    model.name = file.name.replace(/\.[^/.]+$/, ""); // Use file name as object name
+                    
+                    // Center and normalize character, position assets at origin
+                    const box = new THREE.Box3().setFromObject(model);
+                    const center = box.getCenter(new THREE.Vector3());
+                    
+                    if (isCharacter) {
+                        const size = box.getSize(new THREE.Vector3());
+                        const maxDim = Math.max(size.x, size.y, size.z);
+                        const scale = 1.65 / maxDim; // Target height of ~1.65m
+                        model.scale.setScalar(scale);
+                        box.setFromObject(model); // Recalculate box after scaling
+                        model.position.y -= box.min.y; // Place feet on the floor
+                    } else {
+                         model.position.sub(center); // Center asset at origin
                     }
-                    currentModel = gltf.scene;
-                    scene.add(currentModel);
+                    
+                    model.traverse(node => { if (node.isMesh) node.castShadow = true; });
+                    
+                    const objectData = {
+                        mesh: model,
+                        bones: [],
+                        materials: new Map()
+                    };
+
+                    model.traverse(node => {
+                        if (node.isBone) objectData.bones.push(node.name);
+                        if (node.isMesh && node.material) {
+                            if (!objectData.materials.has(node.material.uuid)) {
+                                objectData.materials.set(node.material.uuid, {
+                                    name: node.material.name || `Material_${objectData.materials.size}`,
+                                    ref: node.material
+                                });
+                            }
+                        }
+                    });
+
+                    sceneObjects.set(model.uuid, objectData);
+                    scene.add(model);
+
+                    if (isCharacter) mainCharacter = objectData;
+                    
+                    createUIForObject(objectData);
+                    setActiveObject(model.uuid);
                 });
             };
             reader.readAsArrayBuffer(file);
-        });
+        }
 
-        // 2. Load Texture Image
-        document.getElementById('textureInput').addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (!file || !currentModel) {
-                alert("Please load a model first!");
-                return;
+        function resetScene() {
+            sceneObjects.forEach(data => scene.remove(data.mesh));
+            sceneObjects.clear();
+            mainCharacter = null;
+            controlPanelsContainer.innerHTML = '';
+            tabBarContainer.innerHTML = '';
+        }
+
+        function createUIForObject(objectData) {
+            const { mesh, bones, materials } = objectData;
+            const id = mesh.uuid;
+            
+            // 1. Create Tab
+            const tab = document.createElement('button');
+            tab.className = 'tab-btn';
+            tab.textContent = mesh.name;
+            tab.dataset.id = id;
+            tab.onclick = () => setActiveObject(id);
+            tabBarContainer.appendChild(tab);
+
+            // 2. Create Control Panel
+            const panel = document.createElement('div');
+            panel.className = 'panel';
+            panel.dataset.id = id;
+            
+            let panelHTML = `
+                <div class="control-group">
+                    <h3>Position</h3>
+                    ${createSlider('pos-x', 'X', mesh.position.x, -5, 5, 0.01)}
+                    ${createSlider('pos-y', 'Y', mesh.position.y, -5, 5, 0.01)}
+                    ${createSlider('pos-z', 'Z', mesh.position.z, -5, 5, 0.01)}
+                </div>
+                <div class="control-group">
+                    <h3>Rotation (Degrees)</h3>
+                    ${createSlider('rot-x', 'X', THREE.MathUtils.radToDeg(mesh.rotation.x), -180, 180, 1)}
+                    ${createSlider('rot-y', 'Y', THREE.MathUtils.radToDeg(mesh.rotation.y), -180, 180, 1)}
+                    ${createSlider('rot-z', 'Z', THREE.MathUtils.radToDeg(mesh.rotation.z), -180, 180, 1)}
+                </div>
+                <div class="control-group">
+                    <h3>Scale</h3>
+                    ${createSlider('scale-all', 'S', mesh.scale.x, 0.1, 5, 0.01)}
+                </div>
+            `;
+            
+            // Attachment UI for assets
+            if (mainCharacter && objectData !== mainCharacter) {
+                const boneOptions = mainCharacter.bones.map(name => `<option value="${name}">${name}</option>`).join('');
+                panelHTML += `
+                    <div class="control-group">
+                        <h3>Attachment</h3>
+                        <select class="attachment-select" data-id="${id}">
+                            <option value="scene">-- Detach (World) --</option>
+                            ${boneOptions}
+                        </select>
+                    </div>
+                `;
             }
 
+            // Material/Texture UI
+            if (materials.size > 0) {
+                 panelHTML += `<div class="control-group"><h3>Materials</h3>`;
+                 materials.forEach((mat, uuid) => {
+                     panelHTML += `
+                        <div class="material-item">
+                            <span>${mat.name}</span>
+                            <button class="btn secondary" style="float: right; padding: 5px 10px;" onclick="document.getElementById('texture-input-${uuid}').click()">Apply Texture</button>
+                            <input type="file" id="texture-input-${uuid}" accept="image/*" style="display:none;" data-mat-uuid="${uuid}">
+                        </div>
+                     `;
+                 });
+                 panelHTML += `</div>`;
+            }
+
+            panel.innerHTML = panelHTML;
+            controlPanelsContainer.appendChild(panel);
+            addEventListenersToPanel(panel, objectData);
+        }
+
+        function createSlider(id, label, value, min, max, step) {
+            return `
+                <div class="slider-container">
+                    <label for="${id}">${label}</label>
+                    <input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}">
+                    <input type="number" id="${id}-num" min="${min}" max="${max}" step="${step}" value="${value}">
+                </div>
+            `;
+        }
+
+        function addEventListenersToPanel(panel, objectData) {
+            const { mesh } = objectData;
+            
+            const updateTransform = () => {
+                mesh.position.set(
+                    parseFloat(panel.querySelector('#pos-x').value),
+                    parseFloat(panel.querySelector('#pos-y').value),
+                    parseFloat(panel.querySelector('#pos-z').value)
+                );
+                mesh.rotation.set(
+                    THREE.MathUtils.degToRad(parseFloat(panel.querySelector('#rot-x').value)),
+                    THREE.MathUtils.degToRad(parseFloat(panel.querySelector('#rot-y').value)),
+                    THREE.MathUtils.degToRad(parseFloat(panel.querySelector('#rot-z').value))
+                );
+                const scale = parseFloat(panel.querySelector('#scale-all').value);
+                mesh.scale.set(scale, scale, scale);
+            };
+
+            ['pos-x', 'pos-y', 'pos-z', 'rot-x', 'rot-y', 'rot-z', 'scale-all'].forEach(axis => {
+                const slider = panel.querySelector(`#${axis}`);
+                const number = panel.querySelector(`#${axis}-num`);
+                slider.addEventListener('input', () => { number.value = slider.value; updateTransform(); });
+                number.addEventListener('input', () => { slider.value = number.value; updateTransform(); });
+            });
+            
+            // Attachment logic
+            const attachmentSelect = panel.querySelector('.attachment-select');
+            if (attachmentSelect) {
+                attachmentSelect.addEventListener('change', (e) => {
+                    const boneName = e.target.value;
+                    const currentParent = mesh.parent;
+                    currentParent.remove(mesh); // Detach from current parent
+
+                    if (boneName === 'scene') {
+                        scene.add(mesh);
+                    } else {
+                        const bone = mainCharacter.mesh.getObjectByName(boneName);
+                        if (bone) bone.add(mesh);
+                    }
+                });
+            }
+
+            // Texture logic
+            objectData.materials.forEach((mat, uuid) => {
+                const input = panel.querySelector(`#texture-input-${uuid}`);
+                input.addEventListener('change', (e) => loadTextureForMaterial(e.target.files[0], mat.ref));
+            });
+        }
+        
+        function loadTextureForMaterial(file, material) {
+            if (!file) return;
             const reader = new FileReader();
             reader.onload = (e) => {
-                textureLoader.load(e.target.result, (texture) => {
-                    texture.flipY = false; // Important for GLTF
+                new THREE.TextureLoader().load(e.target.result, (texture) => {
+                    texture.flipY = false;
                     texture.colorSpace = THREE.SRGBColorSpace;
-                    
-                    // Apply texture to the first found mesh
-                    currentModel.traverse((child) => {
-                        if (child.isMesh) {
-                            child.material.map = texture;
-                            child.material.needsUpdate = true;
-                        }
-                    });
+                    material.map = texture;
+                    material.needsUpdate = true;
                 });
             };
             reader.readAsDataURL(file);
-        });
-        
-        // 3. Export as GLB
-        document.getElementById('exportBtn').addEventListener('click', () => {
-            if (!currentModel) {
-                alert("No model to export!");
-                return;
-            }
-            const exporter = new GLTFExporter();
-            exporter.parse(
-                currentModel,
-                (result) => {
-                    const blob = new Blob([result], { type: 'application/octet-stream' });
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = 'textured_model.glb';
-                    link.click();
-                },
-                (error) => {
-                    console.error('An error happened during parsing', error);
-                },
-                { binary: true } // Crucial for .glb export
-            );
-        });
+        }
 
-        // --- PWA Service Worker ---
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register(
-                'data:application/javascript,' +
-                'const CACHE_NAME = "glb-tool-cache-v1";' +
-                'const urlsToCache = ["' + location.href + '"];' +
-                'self.addEventListener("install", event => {' +
-                '  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)));' +
-                '});' +
-                'self.addEventListener("fetch", event => {' +
-                '  event.respondWith(caches.match(event.request).then(response => response || fetch(event.request)));' +
-                '});',
-                {scope: './'}
-            ).then(function(registration) {
-                console.log('ServiceWorker registration successful with scope: ', registration.scope);
-            }).catch(function(err) {
-                console.log('ServiceWorker registration failed: ', err);
+        function setActiveObject(id) {
+            activeObjectId = id;
+            document.querySelectorAll('.tab-btn, .panel').forEach(el => {
+                if (el.dataset.id === id) el.classList.add('active');
+                else el.classList.remove('active');
             });
         }
+
+        function copyTransform() {
+            if (!activeObjectId || !sceneObjects.has(activeObjectId)) {
+                alert("Select an asset to copy its transform.");
+                return;
+            }
+            const { mesh } = sceneObjects.get(activeObjectId);
+            if (!mesh.parent || !mesh.parent.isBone) {
+                alert("Asset must be attached to a character bone to copy its local transform.");
+                return;
+            }
+            
+            const pos = mesh.position;
+            const rot = mesh.rotation;
+            const scl = mesh.scale;
+
+            const output = `// Transform for ${mesh.name} attached to ${mesh.parent.name}\n` +
+                           `axeMesh.position.set(${pos.x.toFixed(4)}, ${pos.y.toFixed(4)}, ${pos.z.toFixed(4)});\n` +
+                           `axeMesh.rotation.set(${rot.x.toFixed(4)}, ${rot.y.toFixed(4)}, ${rot.z.toFixed(4)}); // In Radians\n` +
+                           `axeMesh.scale.set(${scl.x.toFixed(4)}, ${scl.y.toFixed(4)}, ${scl.z.toFixed(4)});`;
+            
+            navigator.clipboard.writeText(output).then(() => {
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => copyBtn.textContent = 'Copy Transform', 1500);
+            }).catch(err => alert('Failed to copy text.'));
+        }
+
+        // --- Initial Event Listeners ---
+        document.getElementById('loadCharacterBtn').onclick = () => document.getElementById('characterInput').click();
+        document.getElementById('loadAssetBtn').onclick = () => {
+            if (!mainCharacter) alert("Please load a character first!");
+            else document.getElementById('assetInput').click();
+        };
+        document.getElementById('characterInput').onchange = (e) => loadGLB(e.target.files[0], true);
+        document.getElementById('assetInput').onchange = (e) => loadGLB(e.target.files[0], false);
+        copyBtn.onclick = copyTransform;
     </script>
 </body>
 </html>
